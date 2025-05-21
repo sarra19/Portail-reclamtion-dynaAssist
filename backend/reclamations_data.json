@@ -1,0 +1,62 @@
+[
+    {
+        "content": "Problèmes de configuration avec Microsoft Dynamics 365 Business Central",
+        "resolution": "Vérifiez les prérequis système et suivez notre guide de configuration étape par étape. Contactez notre support si le problème persiste."
+    },
+    {
+        "content": "Erreurs de migration des données dans Dynamics 365",
+        "resolution": "Assurez-vous que les données source sont propres et bien formatées. Utilisez nos outils de migration recommandés et vérifiez les logs d'erreur."
+    },
+    {
+        "content": "Contenu de formation inadéquat pour Power Platform",
+        "resolution": "Précisez vos besoins spécifiques pour que nous puissions adapter le contenu de formation. Nous proposons aussi des sessions personnalisées."
+    },
+    {
+        "content": "Bugs dans le développement spécifique",
+        "resolution": "Fournissez un rapport détaillé des bugs rencontrés (étapes pour reproduire, captures d'écran). Notre équipe priorisera les corrections."
+    },
+    {
+        "content": "Délais de livraison non respectés pour un projet custom",
+        "resolution": "Nous nous excusons pour ce retard. Notre chef de projet vous contactera pour établir un nouveau calendrier réaliste."
+    },
+    {
+        "content": "Support technique trop lent pour une intégration ERP",
+        "resolution": "Votre ticket a été escaladé à notre équipe senior. Vous recevrez une mise à jour dans les 2 heures ouvrables."
+    },
+    {
+        "content": "Facturation excessive pour un service de conseil",
+        "resolution": "Nous vérifions immédiatement votre dossier. Un responsable financier vous contactera avec une analyse détaillée des coûts."
+    },
+    {
+        "content": "Problèmes de performance avec Power Platform",
+        "resolution": "Optimisez vos flux de données et vérifiez les limites de capacité. Notre équipe peut vous aider à restructurer votre solution."
+    },
+    {
+        "content": "Manque de documentation technique",
+        "resolution": "Nous mettons à disposition notre documentation complète sur le portail client. Demandez un accès à votre gestionnaire de compte."
+    },
+    {
+        "content": "Audit incomplet pour une mission d'évaluation",
+        "resolution": "Notre lead auditor réexaminera les conclusions et vous fournira un addendum sous 5 jours ouvrés."
+    },
+    {
+        "content": "Problèmes de compatibilité avec un développement spécifique",
+        "resolution": "Fournissez les détails de votre environnement technique. Nous adapterons la solution pour une parfaite interopérabilité."
+    },
+    {
+        "content": "Formateur non qualifié lors d'une session Power Platform",
+        "resolution": "Nous organiserons une nouvelle session avec un expert certifié Microsoft, à nos frais."
+    },
+    {
+        "content": "Mauvaise communication pendant un conseil stratégique",
+        "resolution": "Un point de contact dédié vous sera attribué pour garantir des updates régulières et claires."
+    },
+    {
+        "content": "Maintenance préventive insuffisante",
+        "resolution": "Nous ajusterons votre plan de maintenance pour inclure des contrôles plus fréquents et complets."
+    },
+    {
+        "content": "Résultats insatisfaisants après une mission d'audit",
+        "resolution": "Notre directeur qualité examinera personnellement votre cas et proposera un plan d'action correctif."
+    }
+]
