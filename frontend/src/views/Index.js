@@ -26,30 +26,30 @@ export default function Index() {
       <IndexNavbar />
       <section className="header relative pt-16 items-center element-back flex h-screen max-h-860-px 
 animate-fade-right animate-once animate-duration-[2000ms]  animate-ease-in-out animate-fill-forwards">
-       <div className="container mx-auto flex items-center flex-wrap">
-  <div className="w-full md:w-8/12 lg:w-6/12 xl:w-6/12 px-4">
-    <div className="pt-32 sm:pt-0">
-      <h2 className="font-semibold text-4xl text-white">
-        Service Réclamation DynaAssist - Dynamix Services
-      </h2>
-      <p className="mt-4 text-lg leading-relaxed text-white">
-        Plateforme dédiée à la gestion efficace des réclamations clients et fournisseurs, 
-        intégrée aux solutions Microsoft ERP pour un suivi optimal.
-      </p>
-    <div className="mt-12">
-  <a
-    href={user?.Role === 2 ? "/mes-réclamations" : "/services"}
-    className="bg-orange-dys text-white active:bg-lightBlue-600 font-bold uppercase px-6 py-4 mt-4 shadow hover:shadow-md outline-none focus:outline-none mr-1 inline-flex items-center animate-ease-in-out animate-fill-forwards hover:animate-jump hover:animate-once hover:animate-duration-[2000ms] hover:animate-delay-0"
-  >
-    Commencer
-    <i className="fas fa-arrow-right text-white ml-2"></i>
-  </a>
-</div>
+        <div className="container mx-auto flex items-center flex-wrap">
+          <div className="w-full md:w-8/12 lg:w-6/12 xl:w-6/12 px-4">
+            <div className="pt-32 sm:pt-0">
+              <h2 className="font-semibold text-4xl text-white">
+                Service Réclamation DynaAssist - Dynamix Services
+              </h2>
+              <p className="mt-4 text-lg leading-relaxed text-white">
+                Plateforme dédiée à la gestion efficace des réclamations clients et fournisseurs,
+                intégrée aux solutions Microsoft ERP pour un suivi optimal.
+              </p>
+              <div className="mt-12">
+                <a
+                  href={user?.Role === 2 ? "/mes-réclamations" : "/services"}
+                  className="bg-orange-dys text-white active:bg-lightBlue-600 font-bold uppercase px-6 py-4 mt-4 shadow hover:shadow-md outline-none focus:outline-none mr-1 inline-flex items-center animate-ease-in-out animate-fill-forwards hover:animate-jump hover:animate-once hover:animate-duration-[2000ms] hover:animate-delay-0"
+                >
+                  Commencer
+                  <i className="fas fa-arrow-right text-white ml-2"></i>
+                </a>
+              </div>
 
 
-    </div>
-  </div>
-</div>
+            </div>
+          </div>
+        </div>
 
         <img
           className="absolute top-2 b-auto right-0 mr-4 pt-16 sm:w-6/12 -mt-48 sm:mt-0 w-6/12 max-h-50px animate-fade-right animate-once animate-duration-[2000ms] animate-ease-in-out animate-fill-forwards "

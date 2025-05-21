@@ -9,6 +9,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import uploadFile from '../../../helpers/uploadFile';
 import { motion } from "framer-motion";
 import { FaTags, FaUser, FaMoneyBillWave } from "react-icons/fa";
+import { useSelector } from "react-redux";
 
 export default function CardDétailsServiceFront() {
   const [loading, setLoading] = useState(true);
@@ -21,25 +22,8 @@ export default function CardDétailsServiceFront() {
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
+  const currentUser = useSelector(state => state?.user?.user)
 
-  const fetchCurrentUser = async () => {
-    try {
-      const response = await fetch(SummaryApi.current_user.url, {
-        method: SummaryApi.current_user.method,
-        credentials: "include",
-      });
-      const result = await response.json();
-      if (result.success) {
-        setCurrentUser(result.data);
-      } else {
-        console.log(result.message);
-      }
-    } catch (error) {
-      console.error("Error fetching user details:", error);
-      toast.error("Failed to fetch user details.");
-    }
-  };
 
   const fetchLikeStatus = async () => {
     if (!currentUser) return;
@@ -301,7 +285,6 @@ export default function CardDétailsServiceFront() {
       }
     };
 
-    fetchCurrentUser();
     fetchServiceDetails();
     fetchComments();
   }, [id]);

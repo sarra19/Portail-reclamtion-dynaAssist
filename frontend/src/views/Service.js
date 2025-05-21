@@ -5,7 +5,7 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
 import CardStats from "components/Cards/CardStats";
 import HeaderAuth from "components/Header/HeaderAuth";
 import { useSelector } from 'react-redux';
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import { motion } from "framer-motion"; // Importer motion
 
 export default function Service() {
@@ -107,6 +107,8 @@ export default function Service() {
     <>
       <HeaderAuth fixed />
       <IndexNavbar fixed />
+                <ToastContainer position='top-center' />
+      
       <main>
         {/* Section Hero */}
         <div className="relative pt-16 pb-32 flex content-center items-center justify-center min-h-screen-75">

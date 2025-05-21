@@ -9,10 +9,10 @@ import HeaderAuth from "components/Header/HeaderAuth";
 import IndexNavbar from "components/Navbars/IndexNavbar.js";
 import Footer from "components/Footers/Footer";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 export default function CardChatMessage() {
   const socket = useRef();
-  const [currentUser, setCurrentUser] = useState(null);
   const [chats, setChats] = useState([]);
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [currentChat, setCurrentChat] = useState(null);
@@ -22,23 +22,8 @@ export default function CardChatMessage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [showUserList, setShowUserList] = useState(false);
 
-  const fetchCurrentUser = async () => {
-    try {
-      const response = await fetch(SummaryApi.current_user.url, {
-        method: SummaryApi.current_user.method,
-        credentials: "include",
-      });
-      const result = await response.json();
-      if (result.success) {
-        setCurrentUser(result.data);
-      } else {
-        console.log(result.message);
-      }
-    } catch (error) {
-      console.error("Error fetching user details:", error);
-      toast.error("Failed to fetch user details.");
-    }
-  };
+  const currentUser = useSelector(state => state?.user?.user)
+
 
   const fetchAllUsers = async () => {
     try {
@@ -87,7 +72,6 @@ export default function CardChatMessage() {
   };
 
   useEffect(() => {
-    fetchCurrentUser();
     fetchAllUsers();
   }, []);
 

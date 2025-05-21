@@ -2,12 +2,12 @@ import React, { useState, useEffect, useMemo } from "react";
 import SummaryApi from "../../api/common";
 import { toast, ToastContainer } from "react-toastify";
 import ChangeReclamation from "./Modify/ChangeReclamation";
+import { useSelector } from "react-redux";
 
 export default function CardReclamationAdmin() {
   const [allReclamation, setAllReclamation] = useState([]);
   const [receivedReclamations, setReceivedReclamations] = useState([]);
   const [mainTab, setMainTab] = useState("Boîte de réception");
-  const [currentUser, setCurrentUser] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [récPerPage] = useState(5);
   const [statusFilter, setStatusFilter] = useState("all");
@@ -20,23 +20,8 @@ export default function CardReclamationAdmin() {
   const [order, setOrder] = useState("DESC"); // Default order: most recent first
 
   // Fetch current user details
-  const fetchCurrentUser = async () => {
-    try {
-      const response = await fetch(SummaryApi.current_user.url, {
-        method: SummaryApi.current_user.method,
-        credentials: "include",
-      });
-      const result = await response.json();
-      if (result.success) {
-        setCurrentUser(result.data);
-      } else {
-        toast.error("Failed to fetch user details.");
-      }
-    } catch (error) {
-      console.error("Error fetching user details:", error);
-      toast.error("Failed to fetch user details.");
-    }
-  };
+   const currentUser = useSelector(state => state?.user?.user)
+
 
   // Fetch received reclamations with sorting
   const fetchAllRecievedRec = async () => {
@@ -54,7 +39,6 @@ export default function CardReclamationAdmin() {
         setReceivedReclamations(dataResponse.data);
       } else {
         setReceivedReclamations([]);
-        toast.error("Aucune donnée de Réclamation reçue disponible.");
       }
     } catch (error) {
       console.error("Erreur lors de la récupération des Réclamations reçues:", error);
@@ -156,7 +140,6 @@ export default function CardReclamationAdmin() {
 
   // Initialize data and re-fetch on sort change
   useEffect(() => {
-    fetchCurrentUser();
     fetchAllReclamation();
     fetchAllRecievedRec();
   }, [sortBy, order]);
@@ -420,7 +403,7 @@ export default function CardReclamationAdmin() {
         <i className="fas fa-edit"></i>
       </button>
       <button
-        className="bg-red-500 hover:bg-red-600 text-white font-bold uppercase text-xs px-4 py-2 rounded-full"
+        className="ml-1 bg-red-500 hover:bg-red-600 text-white font-bold uppercase text-xs px-4 py-2 rounded-full"
         onClick={() => deleteSentReclamation(reclamation.No_)}
       >
         <i className="fas fa-trash"></i>
@@ -428,14 +411,23 @@ export default function CardReclamationAdmin() {
     </>
   )}
   {/* View Details button: Always shown */}
-  <a href={`/détails-réclamations/${reclamation.No_}`}>
-    <button
-      className="bg-bleu-dys hover:bg-blue-600 text-white font-bold uppercase text-xs px-4 py-2 rounded-full shadow hover:shadow-md"
-      onClick={() => reclamation.Status !== 2 && updateStatus(reclamation.No_)}
-    >
-      <i className="fas fa-eye"></i>
-    </button>
-  </a>
+ <a href={`/détails-réclamations/${reclamation.No_}`}>
+  <button
+    className="ml-1 bg-bleu-dys hover:bg-blue-600 text-white font-bold uppercase text-xs px-4 py-2 rounded-full shadow hover:shadow-md"
+    onClick={(e) => {
+      // Only update status if:
+      // 1. Not in "Envoyé" tab (it's a received reclamation)
+      // 2. Status is not already "Résolue" (2)
+      // 3. User is not a regular user (Role !== 1)
+      if (mainTab !== "Envoyé" && reclamation.Status !== 2 ) {
+        updateStatus(reclamation.No_);
+       
+      }
+    }}
+  >
+    <i className="fas fa-eye"></i>
+  </button>
+</a>
                         </>
                       )}
                     </td>

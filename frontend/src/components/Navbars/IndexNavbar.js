@@ -6,33 +6,18 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import IndexDropdown from "components/Dropdowns/IndexDropdown";
 import UserDropdown from "components/Dropdowns/UserDropdown";
+import { useSelector } from "react-redux";
 
 export default function Navbar(props) {
   const history = useHistory();
   const [navbarOpen, setNavbarOpen] = React.useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
   const [allUsers, setAllUsers] = useState([]); // État pour stocker tous les utilisateurs
   const [searchTerm, setSearchTerm] = useState(""); // État pour stocker la valeur de recherche
   const [showUserList, setShowUserList] = useState(false); // État pour afficher/masquer la liste des utilisateurs
 
   // Récupérer l'utilisateur actuel
-  const fetchCurrentUser = async () => {
-    try {
-      const response = await fetch(SummaryApi.current_user.url, {
-        method: SummaryApi.current_user.method,
-        credentials: "include",
-      });
-      const result = await response.json();
-      if (result.success) {
-        setCurrentUser(result.data);
-      } else {
-        console.log(result.message);
-      }
-    } catch (error) {
-      console.error("Error fetching user details:", error);
-      toast.error("Failed to fetch user details.");
-    }
-  };
+  const currentUser = useSelector(state => state?.user?.user)
+
 
   // Récupérer tous les utilisateurs
   const fetchAllUsers = async () => {
@@ -95,7 +80,6 @@ export default function Navbar(props) {
   const displayedUsers = filteredUsers.slice(0, 4);
 
   useEffect(() => {
-    fetchCurrentUser();
     fetchAllUsers(); // Récupérer tous les utilisateurs au chargement du composant
   }, []);
 

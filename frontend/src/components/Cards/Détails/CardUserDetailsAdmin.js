@@ -10,6 +10,7 @@ import { useHistory } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useParams } from 'react-router-dom';
+import { useSelector } from "react-redux";
 
 export default function CardUserDetailsAdmin() {
   const [isEditing, setIsEditing] = useState(false);
@@ -21,7 +22,6 @@ export default function CardUserDetailsAdmin() {
   const [currentChat, setCurrentChat] = useState(null);
   const [chats, setChats] = useState([]);
   const [user, setUser] = useState(null);
-  const [currentUser, setCurrentUser] = useState(null);
   const [data, setData] = useState({
     FirstName: '',
     LastName: '',
@@ -39,26 +39,8 @@ export default function CardUserDetailsAdmin() {
 
   const history = useHistory();
 
-  const fetchCurrentUser = async () => {
-    try {
-      const response = await fetch(SummaryApi.current_user.url, {
-        method: SummaryApi.current_user.method,
-        credentials: "include",
-      });
-      const result = await response.json();
-      if (result.success) {
-        setCurrentUser(result.data);
-      } else {
-        console.log(result.message);
-      }
-    } catch (error) {
-      console.error("Error fetching user details:", error);
-      toast.error("Failed to fetch user details.");
-    }
-  };
-  useEffect(() => {
-    fetchCurrentUser();
-  }, []);
+  const currentUser = useSelector(state => state?.user?.user)
+
 
   useEffect(() => {
 

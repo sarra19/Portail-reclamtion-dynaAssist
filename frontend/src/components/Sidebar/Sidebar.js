@@ -6,33 +6,14 @@ import NotificationDropdown from "components/Dropdowns/NotificationDropdown.js";
 import UserDropdown from "components/Dropdowns/UserDropdown.js";
 import { toast } from "react-toastify";
 import SummaryApi from "api/common";
+import { useSelector } from "react-redux";
 
 
 export default function Sidebar() {
   const [collapseShow, setCollapseShow] = React.useState("hidden");
-  const [currentUser, setCurrentUser] = useState(null);
 
-  const fetchCurrentUser = async () => {
-    try {
-      const response = await fetch(SummaryApi.current_user.url, {
-        method: SummaryApi.current_user.method,
-        credentials: "include",
-      });
-      const result = await response.json();
-      if (result.success) {
-        setCurrentUser(result.data);
-      } else {
-        console.log(result.message);
-      }
-    } catch (error) {
-      console.error("Error fetching user details:", error);
-      toast.error("Failed to fetch user details.");
-    }
-  };
-  useEffect(() => {
-    fetchCurrentUser();
+  const currentUser = useSelector(state => state?.user?.user)
 
-  }, []);
 
   const handleLogout = async () => {
     try {

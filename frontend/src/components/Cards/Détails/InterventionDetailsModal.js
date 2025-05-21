@@ -1,29 +1,10 @@
 import SummaryApi from "api/common";
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 const InterventionDetailsModal = ({ selectedIntervention, beneficiaryDetails, setShowModal }) => {
-  const [currentUser, setCurrentUser] = useState(null);
+   const currentUser = useSelector(state => state?.user?.user)
 
-  useEffect(() => {
-    fetchCurrentUser();
-  }, []);
-
-  const fetchCurrentUser = async () => {
-    try {
-      const response = await fetch(SummaryApi.current_user.url, {
-        method: SummaryApi.current_user.method,
-        credentials: "include",
-      });
-      const result = await response.json();
-      if (result.success) {
-        setCurrentUser(result.data);
-      } else {
-        console.log(result.message);
-      }
-    } catch (error) {
-      console.error("Error fetching user details:", error);
-    }
-  };
 
   const handleClose = () => {
     setShowModal(false);

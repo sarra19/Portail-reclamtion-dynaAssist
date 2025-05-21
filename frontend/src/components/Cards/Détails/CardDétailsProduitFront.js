@@ -8,6 +8,7 @@ import { ToastContainer } from 'react-toastify';
 import uploadFile from '../../../helpers/uploadFile';
 import { motion } from "framer-motion";
 import { FaTags, FaUser, FaMoneyBillWave } from "react-icons/fa";
+import { useSelector } from "react-redux";
 export default function CardDétailsProduitFront() {
   const [showForm, setShowForm] = React.useState(false);
   const [loading, setLoading] = useState(true);
@@ -15,7 +16,6 @@ export default function CardDétailsProduitFront() {
   const [newComment, setNewComment] = useState("");
   const [showComments, setShowComments] = useState(false);
   const [comments, setComments] = useState([]);
-  const [currentUser, setCurrentUser] = useState(null);
   const [likes, setLikes] = useState();
   const [isLiked, setIsLiked] = useState(false);
   const [commentsNumber, setCommentsNumber] = useState();
@@ -74,23 +74,8 @@ export default function CardDétailsProduitFront() {
     return `envoyé il y a ${diffInDays} j`;
   }
 
-  const fetchCurrentUser = async () => {
-    try {
-      const response = await fetch(SummaryApi.current_user.url, {
-        method: SummaryApi.current_user.method,
-        credentials: "include",
-      });
-      const result = await response.json();
-      if (result.success) {
-        setCurrentUser(result.data);
-      } else {
-        console.log(result.message);
-      }
-    } catch (error) {
-      console.error("Error fetching user details:", error);
-      toast.error("Failed to fetch user details.");
-    }
-  };
+  const currentUser = useSelector(state => state?.user?.user)
+
   // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -352,7 +337,6 @@ export default function CardDétailsProduitFront() {
       }
     };
     fetchProductDetails();
-    fetchCurrentUser();
     fetchComments();
   }, [id]);
 

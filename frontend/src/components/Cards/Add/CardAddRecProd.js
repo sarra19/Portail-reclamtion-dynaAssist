@@ -9,6 +9,7 @@ import { FaCloudUploadAlt } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import DisplayImage from "helpers/DisplayImage";
 import SuggestionsModal from "../SuggestionsModal";
+import { useSelector } from "react-redux";
 
 export default function CardAddRec() {
     const [ComplaintType, setComplaintType] = useState("0");
@@ -36,7 +37,6 @@ export default function CardAddRec() {
         Content: "",
         VoiceNote: null,
     });
-    const [currentUser, setCurrentUser] = useState(null);
     const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
     const [suggestions, setSuggestions] = useState([]);
     const [isSuggestionsModalOpen, setIsSuggestionsModalOpen] = useState(false); // Nouvel état pour le modal
@@ -97,19 +97,8 @@ export default function CardAddRec() {
    
 
     // Fetch current user details
-    const fetchCurrentUser = async () => {
-        try {
-            const response = await fetch(SummaryApi.current_user.url, {
-                method: SummaryApi.current_user.method,
-                credentials: "include",
-            });
-            const result = await response.json();
-            if (result.success) setCurrentUser(result.data);
-        } catch (error) {
-            console.error("Error fetching user details:", error);
-            toast.error("Failed to fetch user details.");
-        }
-    };
+   const currentUser = useSelector(state => state?.user?.user)
+
 
     // Fetch product details
     const fetchProductDetails = async () => {
@@ -132,7 +121,6 @@ export default function CardAddRec() {
     };
 
     useEffect(() => {
-        fetchCurrentUser();
         fetchProductDetails();
     }, [id]);
 

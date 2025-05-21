@@ -6,33 +6,14 @@ import { useHistory } from 'react-router-dom';
 import axios from 'axios'; // Pour faire des requêtes HTTP
 import SummaryApi from '../../api/common'; // Importez SummaryApi
 import { motion } from "framer-motion"; // Importer motion
+import { useSelector } from "react-redux";
 
 export default function CardStats({ statTitle, statDescripiron, statImage, id }) {
   const history = useHistory();
   const [isLoading, setIsLoading] = useState(false); // État pour gérer le chargement
-  const [currentUser, setCurrentUser] = useState(null);
 
-  const fetchCurrentUser = async () => {
-    try {
-      const response = await fetch(SummaryApi.current_user.url, {
-        method: SummaryApi.current_user.method,
-        credentials: "include",
-      });
-      const result = await response.json();
-      if (result.success) {
-        setCurrentUser(result.data);
-      } else {
-        console.log(result.message);
-      }
-    } catch (error) {
-      console.error("Error fetching user details:", error);
-      toast.error("Failed to fetch user details.");
-    }
-  };
+  const currentUser = useSelector(state => state?.user?.user)
 
-  useEffect(() => {
-    fetchCurrentUser();
-  }, []);
 
   const handleReclamationClick = async (e) => {
     e.preventDefault(); 
@@ -52,7 +33,6 @@ export default function CardStats({ statTitle, statDescripiron, statImage, id })
     >
       <div className="flex-auto p-4">
         <div className="flex flex-wrap items-center">
-          <ToastContainer position='top-center' />
 
           <div className="relative w-full pr-4 max-w-full flex-grow flex-1">
             <span className="font-semibold text-xl text-blueGray-700">

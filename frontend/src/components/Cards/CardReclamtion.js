@@ -2,12 +2,12 @@ import React, { useState, useEffect } from "react";
 import SummaryApi from "../../api/common";
 import { toast, ToastContainer } from "react-toastify";
 import ChangeReclamation from "./Modify/ChangeReclamation";
+import { useSelector } from "react-redux";
 
 export default function CardReclamation() {
   const [allReclamation, setAllReclamation] = useState([]);
   const [activeTab, setActiveTab] = useState("Tous");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [currentUser, setCurrentUser] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [récPerPage] = useState(5);
   const [showModal, setShowModal] = useState(false);
@@ -19,23 +19,7 @@ export default function CardReclamation() {
   const [order, setOrder] = useState("DESC"); // Default order: most recent first
 
   // Fetch current user details
-  const fetchCurrentUser = async () => {
-    try {
-      const response = await fetch(SummaryApi.current_user.url, {
-        method: SummaryApi.current_user.method,
-        credentials: "include",
-      });
-      const result = await response.json();
-      if (result.success) {
-        setCurrentUser(result.data);
-      } else {
-        console.log(result.message);
-      }
-    } catch (error) {
-      console.error("Error fetching user details:", error);
-      toast.error("Failed to fetch user details.");
-    }
-  };
+  const currentUser = useSelector(state => state?.user?.user)
 
   // Fetch all reclamations with sorting
   const fetchAllReclamation = async () => {
@@ -140,7 +124,6 @@ export default function CardReclamation() {
 
   // Fetch data on mount and when sortBy or order changes
   useEffect(() => {
-    fetchCurrentUser();
     fetchAllReclamation();
   }, [sortBy, order]);
 

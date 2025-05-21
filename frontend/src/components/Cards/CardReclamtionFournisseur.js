@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import SummaryApi from "../../api/common";
 import { toast, ToastContainer } from "react-toastify";
+import { useSelector } from "react-redux";
 
 export default function CardReclamationFournisseur() {
   const [allReclamation, setAllReclamation] = useState([]);
   const [mainTab, setMainTab] = useState("Boîte de réception");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [currentUser, setCurrentUser] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [récPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState("");
@@ -16,23 +16,8 @@ export default function CardReclamationFournisseur() {
   const [order, setOrder] = useState("DESC"); // Default order: most recent first
 
   // Fetch current user details
-  const fetchCurrentUser = async () => {
-    try {
-      const response = await fetch(SummaryApi.current_user.url, {
-        method: SummaryApi.current_user.method,
-        credentials: "include",
-      });
-      const result = await response.json();
-      if (result.success) {
-        setCurrentUser(result.data);
-      } else {
-        console.log(result.message);
-      }
-    } catch (error) {
-      console.error("Error fetching user details:", error);
-      toast.error("Failed to fetch user details.");
-    }
-  };
+  const currentUser = useSelector(state => state?.user?.user)
+
 
   // Fetch all reclamations with sorting
   const fetchAllReclamation = async () => {
@@ -87,7 +72,26 @@ export default function CardReclamationFournisseur() {
       toast.error("Erreur lors de la mise à jour du statut.");
     }
   };
-
+  async function deleteSentReclamation(reclamationId) {
+    try {
+      const response = await fetch(`${SummaryApi.deleteReclamation.url}`, {
+        method: SummaryApi.deleteReclamation.method,
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ No_: reclamationId }),
+      });
+      const result = await response.json();
+      if (result.success) {
+        toast.success("Réclamation envoyée supprimée avec succès.");
+        fetchAllReclamation();
+      } else {
+        toast.error(result.message || "Échec de la suppression.");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la suppression de la réclamation :", error);
+      toast.error("Erreur lors de la suppression de la réclamation.");
+    }
+  }
   // Archive reclamation
   const ArchiveRec = async (reclamationId) => {
     try {
@@ -187,7 +191,6 @@ export default function CardReclamationFournisseur() {
 
   // Fetch data on mount and when sortBy or order changes
   useEffect(() => {
-    fetchCurrentUser();
     fetchAllReclamation();
   }, [sortBy, order]);
 
@@ -487,6 +490,12 @@ export default function CardReclamationFournisseur() {
                               <i className="fas fa-eye"></i>
                             </button>
                           </a>
+                           <button
+        className=" bg-red-500 hover:bg-red-600 text-white font-bold uppercase text-xs px-4 py-2 rounded-full"
+        onClick={() => deleteSentReclamation(reclamation.No_)}
+      >
+        <i className="fas fa-trash"></i>
+      </button>
                         </>
                       )}
                     </td>

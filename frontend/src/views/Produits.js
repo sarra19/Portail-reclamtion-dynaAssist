@@ -13,7 +13,6 @@ export default function Produits() {
   const [filteredProduit, setFilteredProduit] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [prodPerPage] = useState(4); // Nombre de produits par page
-  const [currentUser, setCurrentUser] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [priceRange, setPriceRange] = useState({ min: 0, max: 1000 });
   const [searchType, setSearchType] = useState("keywords"); // Recherche par défaut : mots-clés
@@ -40,23 +39,7 @@ export default function Produits() {
     },
   };
 
-  const fetchCurrentUser = async () => {
-    try {
-      const response = await fetch(SummaryApi.current_user.url, {
-        method: SummaryApi.current_user.method,
-        credentials: "include",
-      });
-      const result = await response.json();
-      if (result.success) {
-        setCurrentUser(result.data);
-      } else {
-        console.log(result.message);
-      }
-    } catch (error) {
-      console.error("Erreur lors de la récupération des détails de l'utilisateur :", error);
-      toast.error("Échec de la récupération des détails de l'utilisateur.");
-    }
-  };
+  const currentUser = useSelector(state => state?.user?.user)
 
   const fetchAllProduit = async () => {
     try {
@@ -123,7 +106,6 @@ export default function Produits() {
 
   useEffect(() => {
     fetchAllProduit();
-    fetchCurrentUser();
   }, []);
 
   const indexOfLastUser = currentPage * prodPerPage;

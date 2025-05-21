@@ -5,9 +5,9 @@ import SummaryApi from "api/common";
 import uploadFile from "helpers/uploadFile";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
+import { useSelector } from "react-redux";
 
 export default function CardRépRec() {
-  const [currentUser, setCurrentUser] = useState(null);
   const [isGeneratingResponse, setIsGeneratingResponse] = useState(false);
   const [services, setServices] = useState({
     intervention: false,
@@ -34,21 +34,8 @@ export default function CardRépRec() {
   });
 
   // Fetch current user details
-  const fetchCurrentUser = async () => {
-    try {
-      const response = await fetch(SummaryApi.current_user.url, {
-        method: SummaryApi.current_user.method,
-        credentials: "include",
-      });
-      const result = await response.json();
-      if (result.success) {
-        setCurrentUser(result.data);
-      }
-    } catch (error) {
-      console.error("Error fetching user details:", error);
-      toast.error("Failed to fetch user details.");
-    }
-  };
+   const currentUser = useSelector(state => state?.user?.user)
+
 
   // Fetch reclamation details
   const fetchReclamationDetails = async () => {
@@ -69,7 +56,6 @@ export default function CardRépRec() {
   };
 
   useEffect(() => {
-    fetchCurrentUser();
     fetchReclamationDetails();
   }, [id]);
 

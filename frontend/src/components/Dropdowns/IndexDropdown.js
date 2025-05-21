@@ -4,33 +4,20 @@ import { createPopper } from "@popperjs/core";
 import { toast } from "react-toastify";
 import io from "socket.io-client";
 import SummaryApi from "api/common";
+import { useSelector } from "react-redux";
 
 
 const IndexDropdown = () => {
   const [dropdownPopoverShow, setDropdownPopoverShow] = useState(false);
   const btnDropdownRef = useRef();
   const popoverDropdownRef = useRef();
-  const [currentUser, setCurrentUser] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const history = useHistory();
 
   const socket = useRef(null);
 
-  // Fetch current user
-  const fetchCurrentUser = async () => {
-    try {
-      const response = await fetch(SummaryApi.current_user.url, {
-        method: SummaryApi.current_user.method,
-        credentials: "include",
-      });
-      const result = await response.json();
-      if (result.success) {
-        setCurrentUser(result.data);
-      }
-    } catch (error) {
-      console.error("Error fetching user details:", error);
-    }
-  };
+   const currentUser = useSelector(state => state?.user?.user)
+
 
   // Fetch notifications for user
   const fetchNotifications = async (userId) => {
@@ -48,9 +35,6 @@ const IndexDropdown = () => {
     }
   };
 
-  useEffect(() => {
-    fetchCurrentUser();
-  }, []);
 
   useEffect(() => {
     if (currentUser?.No_) {

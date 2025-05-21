@@ -4,31 +4,17 @@ import SummaryApi from "api/common";
 
 import {useHistory } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
 
 const UserDropdown = () => {
   // dropdown props
   const [dropdownPopoverShow, setDropdownPopoverShow] = React.useState(false);
   const btnDropdownRef = React.createRef();
   const popoverDropdownRef = React.createRef();
-  const [currentUser, setCurrentUser] = useState(null);
   const history = useHistory();
 
-  const fetchCurrentUser = async () => {
-    try {
-      const response = await fetch(SummaryApi.current_user.url, {
-        method: SummaryApi.current_user.method,
-        credentials: "include",
-      });
-      const result = await response.json();
-      if (result.success) {
-        setCurrentUser(result.data);
-      } else {
-        console.log(result.message);
-      }
-    } catch (error) {
-      console.error("Error fetching user details:", error);
-    }
-  };
+  const currentUser = useSelector(state => state?.user?.user)
+
   const openDropdownPopover = () => {
     createPopper(btnDropdownRef.current, popoverDropdownRef.current, {
       placement: "bottom-start",
@@ -65,10 +51,7 @@ history.push("/auth/login")
     }
   };
 
-  useEffect(() => {
-    fetchCurrentUser();
 
-  }, []);
   return (
     <>
       <a

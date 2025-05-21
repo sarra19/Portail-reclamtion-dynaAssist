@@ -326,10 +326,7 @@ async function updateReponse(req, res) {
         } = req.body;
 
         // Validation des champs obligatoires
-        console.log("responseId:",responseId)
-        console.log("Content:",content)
-
-        if (!responseId  || !content) {
+        if (!responseId || !content) {
             return res.status(400).json({ message: "Tous les champs obligatoires doivent être remplis." });
         }
 
@@ -343,10 +340,9 @@ async function updateReponse(req, res) {
             FROM [dbo].[CRONUS International Ltd_$ResponseReclamation$deddd337-e674-44a0-998f-8ddd7c79c8b2] 
             WHERE No_ = @ReponseId
         `;
-
         const checkResult = await transaction.request()
-        .input('ReponseId', sql.Int, responseId)
-        .query(checkQuery);
+            .input('ReponseId', sql.Int, responseId)
+            .query(checkQuery);
 
         if (checkResult.recordset[0].count === 0) {
             await transaction.rollback();
@@ -366,13 +362,12 @@ async function updateReponse(req, res) {
                 [ServiceSup] = @ServiceSup
             WHERE No_ = @ReponseId
         `;
-
         const defaultAttachedFile = AttachedFile || "vide";
         await transaction.request()
             .input('Subject', sql.NVarChar, Subject)
             .input('AttachedFile', sql.NVarChar, defaultAttachedFile)
             .input('Content', sql.NVarChar, content)
-            .input('ServiceSup', sql.Int, ServiceSup || "")
+            .input('ServiceSup', sql.Int, ServiceSup || 0)
             .input('ReponseId', sql.Int, responseId)
             .query(updateQuery);
 
@@ -383,18 +378,52 @@ async function updateReponse(req, res) {
                 return res.status(400).json({ message: "Les champs Montant et DatePrevu sont obligatoires pour un remboursement." });
             }
 
-            const remboursementQuery = `
-                UPDATE [dbo].[CRONUS International Ltd_$Payback$deddd337-e674-44a0-998f-8ddd7c79c8b2]
-                SET 
-                    [Montant] = @Montant,
-                    [DatePrevu] = @DatePrevu
+            // Vérifier si un remboursement existe déjà
+            const checkPaybackQuery = `
+                SELECT COUNT(*) AS count 
+                FROM [dbo].[CRONUS International Ltd_$Payback$deddd337-e674-44a0-998f-8ddd7c79c8b2]
+                WHERE ReponseId = @ReponseId
+            `;
+            const paybackCheckResult = await transaction.request()
+                .input('ReponseId', sql.Int, responseId)
+                .query(checkPaybackQuery);
+
+            if (paybackCheckResult.recordset[0].count > 0) {
+                // Mise à jour du remboursement
+                const remboursementQuery = `
+                    UPDATE [dbo].[CRONUS International Ltd_$Payback$deddd337-e674-44a0-998f-8ddd7c79c8b2]
+                    SET 
+                        [Montant] = @Montant,
+                        [DatePrevu] = @DatePrevu
+                    WHERE ReponseId = @ReponseId
+                `;
+                await transaction.request()
+                    .input('Montant', sql.Decimal, Montant)
+                    .input('DatePrevu', sql.Date, DatePrevu)
+                    .input('ReponseId', sql.Int, responseId)
+                    .query(remboursementQuery);
+            } else {
+                // Créer un nouveau remboursement
+                const insertPaybackQuery = `
+                    INSERT INTO [dbo].[CRONUS International Ltd_$Payback$deddd337-e674-44a0-998f-8ddd7c79c8b2]
+                    ([ReponseId], [Montant], [DatePrevu])
+                    VALUES (@ReponseId, @Montant, @DatePrevu)
+                `;
+                await transaction.request()
+                    .input('ReponseId', sql.Int, responseId)
+                    .input('Montant', sql.Decimal, Montant)
+                    .input('DatePrevu', sql.Date, DatePrevu)
+                    .query(insertPaybackQuery);
+            }
+        } else {
+            // Supprimer le remboursement si ServiceSup n'est pas 1 ou 3
+            const deletePaybackQuery = `
+                DELETE FROM [dbo].[CRONUS International Ltd_$Payback$deddd337-e674-44a0-998f-8ddd7c79c8b2]
                 WHERE ReponseId = @ReponseId
             `;
             await transaction.request()
-                .input('Montant', sql.Decimal, Montant)
-                .input('DatePrevu', sql.Date, DatePrevu)
                 .input('ReponseId', sql.Int, responseId)
-                .query(remboursementQuery);
+                .query(deletePaybackQuery);
         }
 
         // Gestion des services supplémentaires : Intervention
@@ -404,18 +433,52 @@ async function updateReponse(req, res) {
                 return res.status(400).json({ message: "Les champs DatePrevuInterv et TechnicienResponsable sont obligatoires pour une intervention." });
             }
 
-            const interventionQuery = `
-                UPDATE [dbo].[CRONUS International Ltd_$Intervention$deddd337-e674-44a0-998f-8ddd7c79c8b2]
-                SET 
-                    [DatePrevuInterv] = @DatePrevuInterv,
-                    [TechnicienResponsable] = @TechnicienResponsable
+            // Vérifier si une intervention existe déjà
+            const checkInterventionQuery = `
+                SELECT COUNT(*) AS count 
+                FROM [dbo].[CRONUS International Ltd_$Intervention$deddd337-e674-44a0-998f-8ddd7c79c8b2]
+                WHERE ReponseId = @ReponseId
+            `;
+            const interventionCheckResult = await transaction.request()
+                .input('ReponseId', sql.Int, responseId)
+                .query(checkInterventionQuery);
+
+            if (interventionCheckResult.recordset[0].count > 0) {
+                // Mise à jour de l'intervention
+                const interventionQuery = `
+                    UPDATE [dbo].[CRONUS International Ltd_$Intervention$deddd337-e674-44a0-998f-8ddd7c79c8b2]
+                    SET 
+                        [DatePrevuInterv] = @DatePrevuInterv,
+                        [TechnicienResponsable] = @TechnicienResponsable
+                    WHERE ReponseId = @ReponseId
+                `;
+                await transaction.request()
+                    .input('DatePrevuInterv', sql.Date, DatePrevuInterv)
+                    .input('TechnicienResponsable', sql.NVarChar, TechnicienResponsable)
+                    .input('ReponseId', sql.Int, responseId)
+                    .query(interventionQuery);
+            } else {
+                // Créer une nouvelle intervention
+                const insertInterventionQuery = `
+                    INSERT INTO [dbo].[CRONUS International Ltd_$Intervention$deddd337-e674-44a0-998f-8ddd7c79c8b2]
+                    ([ReponseId], [DatePrevuInterv], [TechnicienResponsable])
+                    VALUES (@ReponseId, @DatePrevuInterv, @TechnicienResponsable)
+                `;
+                await transaction.request()
+                    .input('ReponseId', sql.Int, responseId)
+                    .input('DatePrevuInterv', sql.Date, DatePrevuInterv)
+                    .input('TechnicienResponsable', sql.NVarChar, TechnicienResponsable)
+                    .query(insertInterventionQuery);
+            }
+        } else {
+            // Supprimer l'intervention si ServiceSup n'est pas 2 ou 3
+            const deleteInterventionQuery = `
+                DELETE FROM [dbo].[CRONUS International Ltd_$Intervention$deddd337-e674-44a0-998f-8ddd7c79c8b2]
                 WHERE ReponseId = @ReponseId
             `;
             await transaction.request()
-                .input('DatePrevuInterv', sql.Date, DatePrevuInterv)
-                .input('TechnicienResponsable', sql.NVarChar, TechnicienResponsable)
                 .input('ReponseId', sql.Int, responseId)
-                .query(interventionQuery);
+                .query(deleteInterventionQuery);
         }
 
         // Valider la transaction
@@ -426,7 +489,6 @@ async function updateReponse(req, res) {
             error: false,
             message: "Réponse mise à jour avec succès!",
         });
-
     } catch (err) {
         if (transaction) await transaction.rollback();
         console.error("Erreur lors de la mise à jour de la réponse:", err);

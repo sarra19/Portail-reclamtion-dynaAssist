@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import { useHistory } from "react-router-dom"; // Import useHistory for programmatic navigation
 import ChangeResponse from "../Modify/ChangeResponse";
+import { useSelector } from "react-redux";
 
 export default function CardDétailsReclamtion() {
   const { id } = useParams();
@@ -38,30 +39,13 @@ export default function CardDétailsReclamtion() {
     intervention: null,
   });
   const [showResponse, setShowResponse] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
   const [translatedData, setTranslatedData] = useState({});
   const [targetLanguage, setTargetLanguage] = useState("fr"); // Default language (French)
   const handleEditResponse = (response) => {
     setSelectedResponse(response); // Store the selected response data
     setShowResponseModal(true); // Show the modal
   };
-  // Fetch current user details
-  const fetchCurrentUser = async () => {
-    try {
-      const response = await fetch(SummaryApi.current_user.url, {
-        method: SummaryApi.current_user.method,
-        credentials: "include",
-      });
-      const result = await response.json();
-      if (result.success) {
-        setCurrentUser(result.data);
-      } else {
-        console.log(result.message);
-      }
-    } catch (error) {
-      console.error("Error fetching user details:", error);
-    }
-  };
+  const currentUser = useSelector(state => state?.user?.user)
 
   // Function to translate text using MyMemory API with caching
   const translateTextWithCache = async (text, lang) => {
@@ -107,55 +91,58 @@ export default function CardDétailsReclamtion() {
 
   // Translate static UI text
   const translateStaticText = async (lang) => {
-    if (lang === "fr") {
-      return {
-        "Détails de Réclamation": "Détails de Réclamation",
-        Envoyeur: "Envoyeur",
-        Cible: "Cible",
-        Description: "Description",
-        Statut: "Statut",
-        "En cours": "En cours",
-        Traité: "Traité",
-        Résolu: "Résolu",
-        "Fichier joint": "Fichier joint",
-        "Envoyé le": "Envoyé le",
-        "Masquer réponse": "Masquer réponse",
-        "Voir réponse": "Voir réponse",
-        Réponse: "Réponse",
-        "Services supplémentaires": "Services supplémentaires",
-        Remboursement: "Remboursement",
-        "Intervention prévue le": "Intervention prévue le",
-        par: "par",
-      };
-    }
+  if (lang === "fr") {
+    return {
+      "Détails de Réclamation": "Détails de Réclamation",
+      Envoyeur: "Envoyeur",
+      Cible: "Cible",
+      Description: "Description",
+      Statut: "Statut",
+      "En cours": "En cours",
+      Traité: "Traité",
+      Résolu: "Résolu",
+      "Fichier joint": "Fichier joint",
+      "Envoyé le": "Envoyé le",
+      "et prévu le": "et prévu le", // Explicitly included
+      "Masquer réponse": "Masquer réponse",
+      "Voir réponse": "Voir réponse",
+      Réponse: "Réponse",
+      "Services supplémentaires": "Services supplémentaires",
+      Remboursement: "Remboursement",
+      "Intervention prévue le": "Intervention prévue le",
+      par: "par",
+    };
+  }
 
-    const staticTexts = [
-      "Détails de Réclamation",
-      "Envoyeur",
-      "Cible",
-      "Description",
-      "Statut",
-      "En cours",
-      "Traité",
-      "Résolu",
-      "Fichier joint",
-      "Envoyé le",
-      "Masquer réponse",
-      "Voir réponse",
-      "Réponse",
-      "Services supplémentaires",
-      "Remboursement",
-      "Intervention prévue le",
-      "par",
-    ];
+  const staticTexts = [
+    "Détails de Réclamation",
+    "Envoyeur",
+    "Cible",
+    "Description",
+    "Statut",
+    "En cours",
+    "Traité",
+    "Résolu",
+    "Fichier joint",
+    "Envoyé le",
+    "et prévu le",
+    "Masquer réponse",
+    "Voir réponse",
+    "Réponse",
+    "Services supplémentaires",
+    "Remboursement",
+    "Intervention prévue le",
+    "par",
+  ];
 
-    const translatedTexts = await translateTextBatch(staticTexts, lang);
-    const translatedStaticTexts = {};
-    staticTexts.forEach((text, index) => {
-      translatedStaticTexts[text] = translatedTexts[index];
-    });
-    return translatedStaticTexts;
-  };
+  const translatedTexts = await translateTextBatch(staticTexts, lang);
+  const translatedStaticTexts = {};
+  staticTexts.forEach((text, index) => {
+    translatedStaticTexts[text] = translatedTexts[index] || text; // Fallback to original text
+  });
+  console.log("Translated static texts for language", lang, ":", translatedStaticTexts); // Debug log
+  return translatedStaticTexts;
+};
 
   // Fetch complaint and response details
   useEffect(() => {
@@ -212,9 +199,7 @@ export default function CardDétailsReclamtion() {
     fetchData();
   }, [id, targetLanguage]);
 
-  useEffect(() => {
-    fetchCurrentUser();
-  }, []);
+
 
   // Translate static UI text when language changes
   useEffect(() => {
@@ -453,7 +438,7 @@ export default function CardDétailsReclamtion() {
                       <li>
                         {translatedData.Remboursement || "Refund"}:{" "}
                         {formatData.remboursement?.montant} TND{" "}
-                        {translatedData["prévu le"] || "scheduled for"}{" "}
+                        {translatedData["et prévu le"] || "and scheduled for"}{" "}
                         {new Date(formatData.remboursement?.datePrevu).toLocaleDateString()}
                       </li>
                     )}

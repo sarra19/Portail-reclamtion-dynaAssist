@@ -1,14 +1,10 @@
-import SummaryApi from "api/common";
 import React, { useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import { toast, ToastContainer } from "react-toastify";
+import SummaryApi from "api/common";
 
-// Utility function to format date to YYYY-MM-DD
-const formatDate = (date) => {
-  if (!date) return "";
-  const d = new Date(date);
-  return d.toISOString().split("T")[0]; // Converts to YYYY-MM-DD
-};
+// Format date to YYYY-MM-DD
+const formatDate = (date) => date ? new Date(date).toISOString().split("T")[0] : "";
 
 const ChangeResponse = ({
   responseId,
@@ -20,67 +16,31 @@ const ChangeResponse = ({
   onClose,
   callFunc,
 }) => {
-  // State management
-  const [subject, setSubject] = useState(initialSubject);
+  const [subject] = useState(initialSubject);
   const [content, setContent] = useState(initialContent);
   const [serviceSup, setServiceSup] = useState(initialServiceSup);
   const [remboursement, setRemboursement] = useState({
     montant: initialRemboursement?.montant || "",
-    datePrevu: initialRemboursement?.datePrevu ? formatDate(initialRemboursement.datePrevu) : "",
+    datePrevu: formatDate(initialRemboursement?.datePrevu),
   });
   const [intervention, setIntervention] = useState({
-    datePrevuInterv: initialIntervention?.datePrevuInterv ? formatDate(initialIntervention.datePrevuInterv) : "",
+    datePrevuInterv: formatDate(initialIntervention?.datePrevuInterv),
     technicienResponsable: initialIntervention?.technicienResponsable || "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Handle changes in content
-  const handleContentChange = (e) => {
-    setContent(e.target.value);
-  };
-
-  // Handle changes in service type
-  const handleServiceSupChange = (e) => {
-    const value = parseInt(e.target.value, 10);
-    setServiceSup(value);
-    if (![1, 3].includes(value)) {
-      setRemboursement({ montant: "", datePrevu: "" });
-    }
-    if (![2, 3].includes(value)) {
-      setIntervention({ datePrevuInterv: "", technicienResponsable: "" });
-    }
-  };
-
-  // Handle changes in refund details
-  const handleRemboursementChange = (e, field) => {
-    setRemboursement((prev) => ({
-      ...prev,
-      [field]: e.target.value,
-    }));
-  };
-
-  // Handle changes in intervention details
-  const handleInterventionChange = (e, field) => {
-    setIntervention((prev) => ({
-      ...prev,
-      [field]: e.target.value,
-    }));
-  };
-
-  // Validate form inputs
   const validateForm = () => {
     if ([1, 3].includes(serviceSup) && (!remboursement.montant || !remboursement.datePrevu)) {
-      toast.error("Veuillez remplir tous les détails du remboursement.");
+      toast.error("Veuillez remplir les détails du remboursement.");
       return false;
     }
     if ([2, 3].includes(serviceSup) && (!intervention.datePrevuInterv || !intervention.technicienResponsable)) {
-      toast.error("Veuillez remplir tous les détails de l'intervention.");
+      toast.error("Veuillez remplir les détails de l'intervention.");
       return false;
     }
     return true;
   };
 
-  // Update response details
   const updateResponseDetails = async () => {
     if (!validateForm()) return;
     setIsSubmitting(true);
@@ -88,9 +48,7 @@ const ChangeResponse = ({
       const response = await fetch(`${SummaryApi.updateReponse.url}`, {
         method: SummaryApi.updateReponse.method,
         credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           responseId,
           Subject: subject,
@@ -108,161 +66,115 @@ const ChangeResponse = ({
         onClose();
         callFunc();
       } else {
-        if (result.errors) {
-          result.errors.forEach((err) => {
-            toast.error(`${err.field}: ${err.message}`);
-          });
-        } else {
-          toast.error(result.message || "Erreur lors de la mise à jour de la réponse.");
-        }
+        (result.errors || [{ message: result.message }]).forEach((err) => {
+          toast.error(`${err.field ? `${err.field}: ` : ""}${err.message}`);
+        });
       }
     } catch (error) {
-      console.error("Erreur lors de la mise à jour de la réponse:", error);
-      toast.error("Une erreur s'est produite lors de la mise à jour de la réponse.");
+      console.error("Erreur:", error);
+      toast.error("Une erreur est survenue.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 top-0 z-50 flex items-center justify-center bg-slate-200 bg-opacity-50 p-4">
-      <div className="mx-auto w-full max-w-4xl rounded-lg bg-white p-8 shadow-xl">
-        <ToastContainer position="top-center" />
+    <div className="fixed top-0 mt-20  p-4  inset-0 z-50 flex items-center justify-center  bg-opacity-50 backdrop-blur-sm">
+      <ToastContainer position="top-center" />
+      <div className="relative border border-orange-dys  w-full max-w-2xl rounded-2xl bg-white p-7  shadow-lg">
         {/* Close Button */}
-        <button
-          className="absolute right-6 top-6 text-gray-600 hover:text-gray-800"
-          onClick={onClose}
-          aria-label="Fermer le modal"
-        >
+        <button onClick={onClose} className="absolute top-4 right-4 text-gray-500 hover:text-red-600">
           <IoMdClose size={24} />
         </button>
+
         {/* Title */}
-        <h1 className="pb-6 text-center text-xl font-semibold text-orange-dys">
-          Modifier les détails de la Réponse
-        </h1>
+        <h2 className="text-2xl font-semibold text-orange-600 mb-4 mt-2 text-center">Modifier la Réponse</h2>
+            <div className=" rounded-md p-4 bg-gray-50">
 
-        {/* Two-column layout */}
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          {/* Left Column - Content & Service Type */}
-          <div className="space-y-5">
-            <div>
-              <label htmlFor="content" className="mb-1 block font-medium text-gray-600">
-                Contenu :
-              </label>
-              <textarea
-                id="content"
-                value={content}
-                onChange={handleContentChange}
-                rows="6"
-                className="w-full rounded-md border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                required
-              ></textarea>
-            </div>
-
-            <div>
-              <label htmlFor="serviceSup" className="mb-1 block font-medium text-gray-600">
-                Type de service :
-              </label>
-              <select
-                id="serviceSup"
-                value={serviceSup}
-                onChange={handleServiceSupChange}
-                className="w-full rounded-md border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500"
-              >
-                <option value="0">Aucun</option>
-                <option value="1">Remboursement</option>
-                <option value="2">Intervention</option>
-                <option value="3">Remboursement et Intervention</option>
-              </select>
-            </div>
+        {/* Content */}
+        <div className="space-y-5">
+          {/* Contenu */}
+          <div>
+            <label className="text-sm font-medium text-gray-700 block">Contenu</label>
+            <textarea
+              rows="4"
+              className="w-full mt-1 rounded-md border px-3 py-2"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="Modifier le contenu de la réponse..."
+            />
           </div>
 
-          {/* Right Column - Conditional Fields */}
-          <div className="space-y-5">
-            {/* Refund Details */}
-            {(serviceSup === 1 || serviceSup === 3) && (
-              <div className="rounded-md border border-gray-200 bg-gray-50 p-4">
-                <h3 className="mb-3 text-lg font-medium text-gray-700">Détails du remboursement :</h3>
-                <div className="space-y-3">
-                  <div>
-                    <label htmlFor="montant" className="mb-1 block text-sm text-gray-600">
-                      Montant :
-                    </label>
-                    <input
-                      id="montant"
-                      type="number"
-                      value={remboursement.montant}
-                      onChange={(e) => handleRemboursementChange(e, "montant")}
-                      className="w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="datePrevu" className="mb-1 block text-sm text-gray-600">
-                      Date prévue :
-                    </label>
-                    <input
-                      id="datePrevu"
-                      type="date"
-                      value={remboursement.datePrevu}
-                      onChange={(e) => handleRemboursementChange(e, "datePrevu")}
-                      className="w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Intervention Details */}
-            {(serviceSup === 2 || serviceSup === 3) && (
-              <div className="rounded-md border border-gray-200 bg-gray-50 p-4">
-                <h3 className="mb-3 text-lg font-medium text-gray-700">Détails de l'intervention :</h3>
-                <div className="space-y-3">
-                  <div>
-                    <label htmlFor="datePrevuInterv" className="mb-1 block text-sm text-gray-600">
-                      Date prévue :
-                    </label>
-                    <input
-                      id="datePrevuInterv"
-                      type="date"
-                      value={intervention.datePrevuInterv}
-                      onChange={(e) => handleInterventionChange(e, "datePrevuInterv")}
-                      className="w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="technicienResponsable" className="mb-1 block text-sm text-gray-600">
-                      Technicien responsable :
-                    </label>
-                    <input
-                      id="technicienResponsable"
-                      type="text"
-                      value={intervention.technicienResponsable}
-                      onChange={(e) => handleInterventionChange(e, "technicienResponsable")}
-                      className="w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
+          {/* Type de service */}
+          <div>
+            <label className="text-sm font-medium text-gray-700 block">Type de service</label>
+            <select
+              className="w-full mt-1 rounded-md border px-3 py-2"
+              value={serviceSup}
+              onChange={(e) => setServiceSup(parseInt(e.target.value))}
+            >
+              <option value={0}>Aucun</option>
+              <option value={1}>Remboursement</option>
+              <option value={2}>Intervention</option>
+              <option value={3}>Remboursement + Intervention</option>
+            </select>
           </div>
+</div>
+          {/* Remboursement */}
+          {(serviceSup === 1 || serviceSup === 3) && (
+            <div className=" rounded-md p-4 bg-gray-50">
+              <h3 className="text-lg font-medium text-gray-700 mb-2">Détails de remboursement</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <input
+                  type="number"
+                  className="rounded-md border px-3 py-2"
+                  placeholder="Montant"
+                  value={remboursement.montant}
+                  onChange={(e) => setRemboursement({ ...remboursement, montant: e.target.value })}
+                />
+                <input
+                  type="date"
+                  className="rounded-md border px-3 py-2"
+                  value={remboursement.datePrevu}
+                  onChange={(e) => setRemboursement({ ...remboursement, datePrevu: e.target.value })}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Intervention */}
+          {(serviceSup === 2 || serviceSup === 3) && (
+            <div className=" rounded-md p-4 bg-gray-50">
+              <h3 className="text-lg font-medium text-gray-700 mb-2">Détails d'intervention</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <input
+                  type="date"
+                  className="rounded-md border px-3 py-2"
+                  value={intervention.datePrevuInterv}
+                  onChange={(e) => setIntervention({ ...intervention, datePrevuInterv: e.target.value })}
+                />
+                <input
+                  type="text"
+                  className="rounded-md border px-3 py-2"
+                  placeholder="Technicien responsable"
+                  value={intervention.technicienResponsable}
+                  onChange={(e) => setIntervention({ ...intervention, technicienResponsable: e.target.value })}
+                />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Submit Button */}
-        <div className="mt-8 flex justify-end">
+        <div className="mt-2 mb-2 mr-2 flex justify-end">
           <button
-            className={`rounded-lg px-6 py-3 font-semibold transition-all duration-200 ${
-              isSubmitting
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-orange-dys hover:bg-orange-600 text-white"
-            }`}
             onClick={updateResponseDetails}
             disabled={isSubmitting}
+            className={`px-6 py-2 text-white font-semibold transition ${
+              isSubmitting ? "bg-orange-dys cursor-not-allowed" : "bg-orange-dys hover:bg-orange-dys"
+            }`}
           >
-            {isSubmitting ? "Mise à jour en cours..." : "Mettre à jour la Réponse"}
+            {isSubmitting ? "Mise à jour..." : "Enregistrer les modifications"}
           </button>
         </div>
       </div>

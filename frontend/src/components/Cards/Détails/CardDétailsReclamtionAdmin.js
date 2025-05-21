@@ -3,6 +3,7 @@ import SummaryApi from "api/common";
 
 import { useParams } from 'react-router-dom';
 import { ToastContainer } from "react-toastify";
+import { useSelector } from "react-redux";
 
 export default function CardDétailsReclamtion() {
   const { id } = useParams();
@@ -36,28 +37,10 @@ export default function CardDétailsReclamtion() {
   });
 
   const [showResponse, setShowResponse] = useState(false); 
-  const [currentUser, setCurrentUser] = useState(null);
 
   // Récupérer l'utilisateur actuel
-  const fetchCurrentUser = async () => {
-    try {
-      const response = await fetch(SummaryApi.current_user.url, {
-        method: SummaryApi.current_user.method,
-        credentials: "include",
-      });
-      const result = await response.json();
-      if (result.success) {
-        setCurrentUser(result.data);
-      } else {
-        console.log(result.message);
-      }
-    } catch (error) {
-      console.error("Error fetching user details:", error);
-    }
-  };
- useEffect(() => {
-    fetchCurrentUser();
-  }, []);
+    const currentUser = useSelector(state => state?.user?.user)
+
   useEffect(() => {
     const fetchRecDetails = async () => {
       try {

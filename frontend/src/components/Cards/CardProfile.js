@@ -3,33 +3,12 @@ import SummaryApi from '../../api/common';
 import { useHistory } from 'react-router-dom';
 
 import { toast } from 'react-toastify';
+import { useSelector } from "react-redux";
 // components
 
 export default function CardProfile() {
-  const [currentUser, setCurrentUser] = useState(null);
+  const currentUser = useSelector(state => state?.user?.user)
 
-  const fetchCurrentUser = async () => {
-    try {
-      const response = await fetch(SummaryApi.current_user.url, {
-        method: SummaryApi.current_user.method,
-        credentials: "include",
-      });
-      const result = await response.json();
-      if (result.success) {
-        setCurrentUser(result.data);
-      } else {
-        console.log(result.message);
-      }
-    } catch (error) {
-      console.error("Error fetching user details:", error);
-      toast.error("Failed to fetch user details.");
-    }
-  };
- 
-  useEffect(() => {
-    fetchCurrentUser();
-
-  }, []);
   return (
     <>
       <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-xl rounded-lg mt-16">
