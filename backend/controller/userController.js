@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken')
 const { sql, connectDB } = require("../config/dbConfig")
-
+const sendEmail = require("../utils/sendEmail");
 const faceapi = require('face-api.js');
 
 
@@ -77,6 +77,9 @@ async function SignUp(req, res) {
       const salt = bcrypt.genSaltSync(10);
       const hashPassword = bcrypt.hashSync(Password, salt);
   
+          const tokenData = { email: Email, nom: LastName };
+          const token = jwt.sign(tokenData, process.env.TOKEN_SECRET_KEY, { expiresIn: "1h" });
+  
       // Insert user with face descriptor
       const insertUserQuery = `
           INSERT INTO [dbo].[CRONUS International Ltd_$User_Details$deddd337-e674-44a0-998f-8ddd7c79c8b2] 
@@ -105,7 +108,23 @@ async function SignUp(req, res) {
         .input('CompagnyUser', sql.NVarChar, '')
 .input('descriptor', sql.NVarChar(sql.MAX), descriptorString)
         .query(insertUserQuery);
-  
+     const verificationUrl = `${process.env.REACT_APP_BACKEND_URL}/${No_}/verify/${token}`;
+        await sendEmail({
+            recipient_email: Email,
+            subject: "Vérifier votre Email",
+            html: `
+                <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+                    <h2 style="color: rgb(241, 94, 26);">Bienvenue dans notre Service!</h2>
+                    <p>Bonjour ${FirstName} ${LastName},</p>
+                    <p>Merci pour votre inscription. Pour finaliser votre inscription, veuillez vérifier votre adresse e-mail en cliquant sur le lien ci-dessous :</p>
+                    <a href="${verificationUrl}" style="display: inline-block; margin: 20px 0; padding: 10px 20px; background-color:rgb(241, 94, 26); color: #ffffff; text-decoration: none; border-radius: 5px;">Vérifier votre Email</a>
+                    <p>Si le bouton ci-dessus ne fonctionne pas, copiez et collez le lien suivant dans votre navigateur :</p>
+                    <p><a href="${verificationUrl}" style="color:rgb(241, 94, 26);">${verificationUrl}</a></p>
+                    <p>Merci pour choisir notre service!</p>
+                </div>
+            `
+        });
+
       res.status(201).json({
         success: true,
         error: false,
@@ -261,7 +280,8 @@ async function userVerify(req, res) {
                     WHERE [No_] = @No_
                 `);
 
-            res.redirect("https://portail-reclamtion-mern-erp.onrender.com/auth/login");
+            // res.redirect("https://portail-reclamtion-mern-erp.onrender.com/auth/login");
+            res.redirect("http://localhost:3000/auth/login");
         });
     } catch (error) {
         console.error("Erreur de vérification de l'email :", error);

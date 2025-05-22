@@ -193,14 +193,14 @@ export default function ProfileUsers() {
             return prevChats;
           });
           setCurrentChat({ No_: result.data.chatId, members: result.data.members });
-          toast.success("Chat already exists, redirecting to existing chat");
+          toast.success("Le chat existe déjà, redirection vers le chat existant");
 
           // Navigate to the chat page
           history.push('/chat');
         } else {
           setChats((prevChats) => [...prevChats, result.data]);
           setCurrentChat(result.data);
-          toast.success("Chat created successfully");
+          toast.success("Chat créé avec succès");
 
           // Navigate to the chat page
           history.push('/chat');

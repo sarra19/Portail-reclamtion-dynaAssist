@@ -9,8 +9,8 @@ async function add(req, res) {
 
         const { Content, AttachedFile, ServiceId, ProductId } = req.body;
 
-        if (!Content) {
-            return res.status(400).json({ message: "Saisir votre Commentaire." });
+        if (!Content && !AttachedFile) {
+            return res.status(400).json({ message: "Saisir votre Commentaire ou ajouter un fichier." });
         }
 
         console.log("🔹 ServiceId reçu:", ServiceId); // ➜ Affiche la valeur dans la console

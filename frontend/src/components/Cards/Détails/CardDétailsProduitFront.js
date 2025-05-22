@@ -9,6 +9,7 @@ import uploadFile from '../../../helpers/uploadFile';
 import { motion } from "framer-motion";
 import { FaTags, FaUser, FaMoneyBillWave } from "react-icons/fa";
 import { useSelector } from "react-redux";
+import DisplayImage from "helpers/DisplayImage";
 export default function CardDétailsProduitFront() {
   const [showForm, setShowForm] = React.useState(false);
   const [loading, setLoading] = useState(true);
@@ -20,6 +21,11 @@ export default function CardDétailsProduitFront() {
   const [isLiked, setIsLiked] = useState(false);
   const [commentsNumber, setCommentsNumber] = useState();
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [fullScreenImage, setFullScreenImage] = useState("");
+  const [openFullScreenImage, setOpenFullScreenImage] = useState(false);
+  const [showResponseModal, setShowResponseModal] = useState(false); 
+  const [selectedImage, setSelectedImage] = useState("");
+  const [showImageModal, setShowImageModal] = useState(false);  
 
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editedContent, setEditedContent] = useState("");
@@ -204,10 +210,7 @@ export default function CardDétailsProduitFront() {
       return;
     }
 
-    if (newComment.trim() === "") {
-      toast.error("Le commentaire ne peut pas être vide.");
-      return;
-    }
+   
 
     const formData = {
       Content: newComment,
@@ -560,14 +563,27 @@ export default function CardDétailsProduitFront() {
                                               <p className="text-gray-800 font-semibold">{comment.user?.FirstName} {comment.user?.LastName}</p>
                                               <p className="text-gray-500 text-sm">{comment.Content}</p>
                                               {comment.AttachedFile && comment.AttachedFile.trim() !== "" && (
-                                                <img
-                                                  src={comment.AttachedFile}
-                                                  alt="Attached File"
-                                                  width={80}
-                                                  height={80}
-                                                  className="bg-slate-100 border cursor-pointer"
-                                                />
-                                              )}
+  <div className="flex flex-wrap gap-2">
+    {comment.AttachedFile.split(',')
+      .map(url => url.trim())
+      .filter(url => url) // Remove empty strings if any
+      .map((imageUrl, index) => (
+        <img
+          key={index}
+          src={imageUrl}
+          alt={`Attached File ${index + 1}`}
+          width={80}
+          height={80}
+          className="bg-slate-100 border cursor-pointer object-cover"
+          onClick={() => {
+            // Optional: Add click handler to view larger image
+            setSelectedImage(imageUrl);
+            setShowImageModal(true);
+          }}
+        />
+      ))}
+  </div>
+)}
                                               <p className="text-gray-400 text-xs mt-1">{timeAgo(comment.CreatedAt)}</p>
                                             </>
                                           )}
@@ -674,22 +690,26 @@ export default function CardDétailsProduitFront() {
                   <span className="sr-only">Send message</span>
                 </button>
               </div>
-              {data.AttachedFile && data.AttachedFile.length > 0 && (
-                <div className="mt-2">
-                  {data.AttachedFile.map((file, index) => (
-                    <img
-                      key={index}
-                      src={URL.createObjectURL(file)}
-                      alt="File Preview"
-                      className="w-20 h-20 mt-2 object-cover rounded-md"
-                    />
-                  ))}
-                </div>
-              )}
+             {data.AttachedFile && data.AttachedFile.length > 0 && (
+  <div className="mt-2 flex flex-row gap-2">
+    {data.AttachedFile.map((file, index) => (
+      <img
+        key={index}
+        src={URL.createObjectURL(file)}
+        alt="File Preview"
+        className="w-15 h-20 object-cover rounded-md"
+      />
+    ))}
+  </div>
+)}
+
             </form>
           </div>
         )}
       </div>
+       {openFullScreenImage && (
+        <DisplayImage onClose={() => setOpenFullScreenImage(false)} imgUrl={fullScreenImage} />
+      )}
     </>
   );
 }

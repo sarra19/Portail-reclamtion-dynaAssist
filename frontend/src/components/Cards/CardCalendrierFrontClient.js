@@ -71,7 +71,6 @@ const CardCalendrierFrontClient = () => {
       setEventsRemboursements(formatted); // Mettre à jour les remboursements seulement
     } catch (error) {
       console.error("Erreur lors de la récupération des remboursements :", error);
-      toast.error("Erreur lors du chargement des remboursements.");
     }
   };
 
@@ -99,7 +98,6 @@ const CardCalendrierFrontClient = () => {
       setEventsInterventions(formatted); // Mettre à jour les interventions seulement
     } catch (error) {
       console.error("Erreur fetchInterventionsSender ou vide ");
-      toast.error("Erreur lors du chargement des interventions.");
     }
   };
 

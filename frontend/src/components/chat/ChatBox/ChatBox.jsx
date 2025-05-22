@@ -45,7 +45,7 @@ useEffect(() => {
           const result = await response.json();
           if (result.success) setUserData(result.data);
         } catch (error) {
-          toast.error("Failed to fetch user data");
+          console.log("Failed to fetch user data");
         }
       }
     };

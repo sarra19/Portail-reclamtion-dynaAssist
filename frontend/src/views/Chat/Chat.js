@@ -133,11 +133,11 @@ export default function CardChatMessage() {
             return prevChats;
           });
           setCurrentChat({ No_: result.data.chatId, members: result.data.members });
-          toast.success("Chat already exists, redirecting to existing chat");
+          toast.success("Le chat existe déjà, redirection vers le chat existant");
         } else {
           setChats((prevChats) => [...prevChats, result.data]);
           setCurrentChat(result.data);
-          toast.success("Chat created successfully");
+          toast.success("Chat créé avec succès");
         }
       } else {
         toast.error(result.message || "Failed to create chat");
@@ -340,10 +340,9 @@ useEffect(() => {
           </div>
         </div>
       </div>
-      <div className="bg-orangelight-dys2 flex justify-center items-center">
-
-        <div className="w-30 max-w-6xl text-center">
-          <div className="text-center ">
+      <div className="bg-orangelight-dys2 flex justify-center items-center py-12">
+  <div className="w-auto max-w-7xl px-4">
+    <div className="text-center mb-12">
             <h1 className="text-4xl text-blueGray-800 font-bold">Ou bien Lancez un Appel Vidéo</h1>
             <p className="text-xl text-blueGray-700 mb-6 mt-4">
             Choisissez votre session préférée pour commencer            </p>

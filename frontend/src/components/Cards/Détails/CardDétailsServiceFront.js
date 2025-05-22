@@ -10,6 +10,7 @@ import uploadFile from '../../../helpers/uploadFile';
 import { motion } from "framer-motion";
 import { FaTags, FaUser, FaMoneyBillWave } from "react-icons/fa";
 import { useSelector } from "react-redux";
+import DisplayImage from "helpers/DisplayImage";
 
 export default function CardDétailsServiceFront() {
   const [loading, setLoading] = useState(true);
@@ -23,13 +24,17 @@ export default function CardDétailsServiceFront() {
   const [newComment, setNewComment] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const currentUser = useSelector(state => state?.user?.user)
+  const [showResponseModal, setShowResponseModal] = useState(false); // Controls the visibility of the response modal
+  const [openFullScreenImage, setOpenFullScreenImage] = useState(false);
 
   // Dans le scope de votre composant
 
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editedContent, setEditedContent] = useState("");
+  const [fullScreenImage, setFullScreenImage] = useState("");
 
-
+const [editedFiles, setEditedFiles] = useState([]);
+const [filePreviews, setFilePreviews] = useState([]);
   const fetchLikeStatus = async () => {
     if (!currentUser) return;
 
@@ -81,6 +86,30 @@ export default function CardDétailsServiceFront() {
     }
   };
 
+  const handleEditFileChange = async (e) => {
+  const files = Array.from(e.target.files);
+  const allowedTypes = ["image/jpeg", "image/png", "image/gif", "application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
+  const maxSize = 5 * 1024 * 1024; // 5MB
+
+  const validFiles = files.filter(file => 
+    allowedTypes.includes(file.type) && file.size <= maxSize
+  );
+
+  if (validFiles.length !== files.length) {
+    toast.error("Certains fichiers ne sont pas valides (type non supporté ou >5MB)");
+  }
+
+  setEditedFiles(prev => [...prev, ...validFiles]);
+
+  // Créer des prévisualisations
+  const previews = await Promise.all(
+    validFiles.map(file => ({
+      file,
+      preview: URL.createObjectURL(file)
+    }))
+  );
+  setFilePreviews(prev => [...prev, ...previews]);
+};
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
     visible: {
@@ -267,38 +296,54 @@ export default function CardDétailsServiceFront() {
       console.error("Erreur lors du chargement des commentaires :", error);
     }
   };
-  const handleUpdateComment = async (commentId) => {
-    if (!editedContent.trim()) {
-      toast.error("Le contenu du commentaire ne peut pas être vide");
-      return;
+const handleUpdateComment = async (commentId) => {
+  if (!editedContent.trim() && editedFiles.length === 0 && filePreviews.length === 0) {
+    toast.error("Le commentaire ne peut pas être vide");
+    return;
+  }
+
+  try {
+    // Uploader les nouveaux fichiers
+    let newFileUrls = [];
+    if (editedFiles.length > 0) {
+      const uploadResults = await Promise.all(
+        editedFiles.map(file => uploadFile(file))
+      );
+      newFileUrls = uploadResults.map(res => res.url);
     }
 
-    try {
-      const response = await fetch(`${SummaryApi.updateComment.url}/${commentId}`, {
-        method: SummaryApi.updateComment.method,
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          Content: editedContent,
-          // Add other fields if needed (Status, AttachedFile)
-        }),
-      });
+    // Combiner les URLs existantes (non supprimées) et les nouvelles
+    const existingUrls = filePreviews
+      .filter(file => !file.file) // Fichiers existants seulement
+      .map(file => file.url);
+    
+    const allFileUrls = [...existingUrls, ...newFileUrls].join(",");
 
-      const result = await response.json();
-      if (result.success) {
-        toast.success("Commentaire mis à jour avec succès");
-        setEditingCommentId(null);
-        fetchComments(); // Refresh comments
-      } else {
-        toast.error(result.message);
-      }
-    } catch (error) {
-      console.error("Erreur lors de la mise à jour du commentaire:", error);
-      toast.error("Erreur lors de la mise à jour");
+    const response = await fetch(`${SummaryApi.updateComment.url}/${commentId}`, {
+      method: SummaryApi.updateComment.method,
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        Content: editedContent,
+        AttachedFile: allFileUrls,
+      }),
+    });
+
+    const result = await response.json();
+    if (result.success) {
+      toast.success("Commentaire mis à jour avec succès");
+      setEditingCommentId(null);
+      fetchComments(); // Refresh comments
+    } else {
+      toast.error(result.message);
     }
-  };
+  } catch (error) {
+    console.error("Erreur lors de la mise à jour du commentaire:", error);
+    toast.error("Erreur lors de la mise à jour");
+  }
+};
   useEffect(() => {
 
 
@@ -477,41 +522,102 @@ export default function CardDétailsServiceFront() {
                           />
                           <div className="w-full">
                             {editingCommentId === comment.No_ ? (
-                              <>
-                                <textarea
-                                  value={editedContent}
-                                  onChange={(e) => setEditedContent(e.target.value)}
-                                  className="block mt-4 mx-2 p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                  placeholder="Modifier le commentaire..."
-                                  rows={2}
-                                  onKeyDown={(e) => {
-                                    if (e.key === "Enter" && !e.shiftKey) {
-                                      e.preventDefault();
-                                      handleUpdateComment(comment.No_);
-                                    }
-                                  }}
-                                />
-                                <button
-                                  onClick={() => handleUpdateComment(comment.No_)}
-                                  className="text-orange-dys font-bold hover:text-green-700 text-sm"
-                                >
-                                  Sauvegarder
-                                </button>
-
-                              </>
-                            ) : (
+  <div className="w-full">
+    <textarea
+      value={editedContent}
+      onChange={(e) => setEditedContent(e.target.value)}
+      className="block mt-4 mx-2 p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+      placeholder="Modifier le commentaire..."
+      rows={2}
+    />
+    
+    {/* Section fichiers existants */}
+    {filePreviews.length > 0 && (
+      <div className="mt-2">
+        <p className="text-sm text-gray-600">Fichiers existants:</p>
+        <div className="flex flex-wrap gap-2">
+          {filePreviews.map((file, index) => (
+            <div key={index} className="relative">
+              <img
+                src={file.url || file.preview}
+                alt={`Preview ${index}`}
+                className="w-15 h-20 object-cover rounded border"
+              />
+              <button
+                onClick={() => {
+                  setFilePreviews(prev => prev.filter((_, i) => i !== index));
+                  if (file.file) {
+                    setEditedFiles(prev => prev.filter((_, i) => i !== index));
+                  }
+                }}
+                className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
+              >
+                ×
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+    
+    {/* Ajout de nouveaux fichiers */}
+    <div className="mt-2">
+      <input
+        type="file"
+        id={`edit-file-upload-${comment.No_}`}
+        className="hidden"
+        onChange={handleEditFileChange}
+        multiple
+      />
+      <label
+        htmlFor={`edit-file-upload-${comment.No_}`}
+        className="inline-flex items-center px-3 py-1 bg-orange-dys text-white rounded cursor-pointer hover:bg-gray-300"
+      >
+        <FaPaperclip className="mr-1" />
+        Ajouter des fichiers
+      </label>
+    </div>
+    
+    <div className="mt-4 flex justify-end gap-2">
+      <button
+        onClick={() => setEditingCommentId(null)}
+        className="px-3 mr-2 py-1 bg-gray-500 text-white rounded hover:bg-gray-300"
+      >
+        Annuler
+      </button>
+      <button
+        onClick={() => handleUpdateComment(comment.No_)}
+        className="px-3 py-1 bg-blueGray-dys-1 text-white rounded hover:bg-blue-600"
+      >
+        Sauvegarder
+      </button>
+    </div>
+  </div>
+)  : (
                               <>
                                 <p className="text-gray-800 font-semibold">{comment.user?.FirstName} {comment.user?.LastName}</p>
                                 <p className="text-gray-500 text-sm">{comment.Content}</p>
-                                {comment.AttachedFile && comment.AttachedFile.trim() !== "" && (
-                                  <img
-                                    src={comment.AttachedFile}
-                                    alt="Attached File"
-                                    width={80}
-                                    height={80}
-                                    className="bg-slate-100 border cursor-pointer"
-                                  />
-                                )}
+                              {comment.AttachedFile && comment.AttachedFile.trim() !== "" && (
+  <div className="flex flex-wrap gap-2">
+    {comment.AttachedFile.split(',')
+      .map(url => url.trim())
+      .filter(url => url) // Remove empty strings if any
+      .map((imageUrl, index) => (
+        <img
+          key={index}
+          src={imageUrl}
+          alt={`Attached File ${index + 1}`}
+          width={80}
+          height={80}
+          className="bg-slate-100 border cursor-pointer object-cover"
+           onClick={() => {
+                setOpenFullScreenImage(true);
+                setFullScreenImage(imageUrl);
+              }}
+        />
+      ))}
+  </div>
+)}
                                 <p className="text-gray-400 text-xs mt-1">{timeAgo(comment.CreatedAt)}</p>
                               </>
                             )}
@@ -521,16 +627,17 @@ export default function CardDétailsServiceFront() {
 
                       {(currentUser?.No_ === comment.UserId || currentUser?.Role === 0) && (
                         <div className="flex gap-2">
-                          <button
-                            onClick={() => {
-                              setEditingCommentId(comment.No_);
-                              setEditedContent(comment.Content);
-                            }}
-                            className="ml-2 text-blueGray-500 hover:text-blueGray-700 p-1 mr-1"
-                          >
-                            <FaEdit className="w-4 h-4" />
-                          </button>
-
+                         <button
+  onClick={() => {
+    setEditingCommentId(comment.No_);
+    setEditedContent(comment.Content);
+    setEditedFiles([]);
+    setFilePreviews(comment.AttachedFile ? comment.AttachedFile.split(',').map(url => ({ url })) : []);
+  }}
+  className="ml-2 text-blueGray-500 hover:text-blueGray-700 p-1 mr-1"
+>
+  <FaEdit className="w-4 h-4" />
+</button>
 
                           <button
                             onClick={() => handleDeleteComment(comment.No_)}
@@ -604,18 +711,19 @@ export default function CardDétailsServiceFront() {
                       <span className="sr-only">Send message</span>
                     </button>
                   </div>
-                  {data.AttachedFile && data.AttachedFile.length > 0 && (
-                    <div className="mt-2">
-                      {data.AttachedFile.map((file, index) => (
-                        <img
-                          key={index}
-                          src={URL.createObjectURL(file)}
-                          alt="File Preview"
-                          className="w-20 h-20 mt-2 object-cover rounded-md"
-                        />
-                      ))}
-                    </div>
-                  )}
+                 {data.AttachedFile && data.AttachedFile.length > 0 && (
+  <div className="mt-2 flex flex-row gap-2">
+    {data.AttachedFile.map((file, index) => (
+      <img
+        key={index}
+        src={URL.createObjectURL(file)}
+        alt="File Preview"
+        className="w-15 h-20 object-cover rounded-md"
+      />
+    ))}
+  </div>
+)}
+
                 </form>
 
               </div>
@@ -624,7 +732,9 @@ export default function CardDétailsServiceFront() {
           </>
         )}
       </div>
-
+ {openFullScreenImage && (
+        <DisplayImage onClose={() => setOpenFullScreenImage(false)} imgUrl={fullScreenImage} />
+      )}
     </div>
 
 

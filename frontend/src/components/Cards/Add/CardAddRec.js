@@ -204,8 +204,12 @@ export default function CardAddRec() {
         e.preventDefault();
         const newErrors = {};
         if (!data.Subject) newErrors.Subject = "Le sujet est requis.";
-        if (!data.Content || data.Content.length < 10 || data.Content.length > 1000)
-            newErrors.Content = "La description doit contenir entre 10 et 1000 caractères.";
+       if (!data.Content || data.Content.length < 10 || data.Content.length > 1000) {
+        newErrors.Content = "La description doit contenir entre 10 et 1000 caractères.";
+        // Afficher le toast d'erreur
+        toast.error("La description doit contenir entre 10 et 1000 caractères.");
+    }
+
         setErrors(newErrors);
         if (Object.keys(newErrors).length > 0) return;
 

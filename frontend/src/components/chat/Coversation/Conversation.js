@@ -49,7 +49,7 @@ const Conversation = ({ data, currentUser, online, onDelete }) => {
           toast.error(result.message);
         }
       } catch (error) {
-        toast.error("Failed to fetch user data");
+        console.log("Failed to fetch user data");
       }
     };
 

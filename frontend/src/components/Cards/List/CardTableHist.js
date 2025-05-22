@@ -70,7 +70,7 @@ export default function CardTableHist({ color }) {
         toast.error(result.message);
       }
     } catch (error) {
-      toast.error("Failed to fetch user data");
+     console.log("Failed to fetch user data");
     }
   };
 

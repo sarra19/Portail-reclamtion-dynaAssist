@@ -53,9 +53,9 @@ table 50106 "User_Details"
         {
             DataClassification = SystemMetadata;
         }
-        field(205; descriptor; Blob)
+        field(205; descriptor; Text[255])
         {
-            SubType = Memo;
+          
         }
 
         field(206; "Provider "; Text[255])
