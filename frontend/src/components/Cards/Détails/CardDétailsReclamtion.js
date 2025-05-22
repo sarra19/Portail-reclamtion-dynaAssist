@@ -351,26 +351,68 @@ export default function CardDétailsReclamtion() {
                     </span>
                   </h4>
                 </div>
-                {data.AttachedFile !== "vide" && (
-                  <>
-                    <h4 className="font-bold text-white m-4">
-                      {translatedData["Fichier joint"] || "Attached File"}:
-                    </h4>
-                    <div className="flex justify-center mt-4 mb-4">
-                      <img
-                        alt="Fichier joint"
-                        src={data.AttachedFile}
-                        className="w-20 h-48 object-cover rounded-lg shadow-md"
-                        onClick={() => {
-                          setOpenFullScreenImage(true);
-                          setFullScreenImage(data.AttachedFile);
-                        }}
-                      />
-                    </div>
-                  </>
-                )}
+               {data.AttachedFile !== "vide" && (
+  <>
+    <h4 className="font-bold text-white m-4">
+      {translatedData["Fichier joint"] || "Attached File"}:
+    </h4>
+    <div className="flex flex-wrap justify-center gap-4 mt-4 mb-4">
+      {(() => {
+        // Si c'est un tableau, on l'utilise directement
+        if (Array.isArray(data.AttachedFile)) {
+          return data.AttachedFile.map((fileUrl, index) => (
+            <img
+              key={index}
+              alt={`Fichier joint ${index + 1}`}
+              src={fileUrl}
+              className="w-20 h-48 object-cover rounded-lg shadow-md cursor-pointer"
+              onClick={() => {
+                setOpenFullScreenImage(true);
+                setFullScreenImage(fileUrl);
+              }}
+            />
+          ));
+        }
+        // Si c'est une chaîne contenant des virgules, on la divise
+        else if (typeof data.AttachedFile === 'string' && data.AttachedFile.includes(',')) {
+          return data.AttachedFile.split(',').map((fileUrl, index) => (
+            <img
+              key={index}
+              alt={`Fichier joint ${index + 1}`}
+              src={fileUrl.trim()}
+              className="w-20 h-48 ml-2 object-cover rounded-lg shadow-md cursor-pointer"
+              onClick={() => {
+                setOpenFullScreenImage(true);
+                setFullScreenImage(fileUrl.trim());
+              }}
+            />
+          ));
+        }
+        // Sinon, on traite comme une URL unique
+        else {
+          return (
+            <img
+              alt="Fichier joint"
+              src={data.AttachedFile}
+              className="w-20 h-48 object-cover rounded-lg shadow-md cursor-pointer"
+              onClick={() => {
+                setOpenFullScreenImage(true);
+                setFullScreenImage(data.AttachedFile);
+              }}
+            />
+          );
+        }
+      })()}
+    </div>
+  </>
+)}
                 <p className="text-sm font-light text-white text-right m-4">
-                  {translatedData["Envoyé le"] || "Sent on"}: {data.CreatedAt}
+                  {translatedData["Envoyé le"] || "Sent on"}:  {new Date(data.CreatedAt).toLocaleString('fr-FR', {
+  timeZone: 'UTC', // important !
+  dateStyle: 'full',
+  timeStyle: 'medium'
+})
+}
                 </p>
                 <div className="flex justify-end mt-6 space-x-4 m-4">
                   {formatData.responseId && (
@@ -419,20 +461,58 @@ export default function CardDétailsReclamtion() {
                   <p className="text-md font-light text-white text-center m-4">
                     {translatedData.responseContent || formatData.content}
                   </p>
-                  {formatData.attachedFile !== "vide" && (
-                    <>
-                      <h4 className="font-bold text-white m-4">
-                        {translatedData["Fichier joint"] || "Attached File"}:
-                      </h4>
-                      <div className="flex justify-center mt-4 mb-4">
-                        <img
-                          alt="Fichier joint"
-                          src={formatData.attachedFile}
-                          className="w-20 h-48 object-cover rounded-lg shadow-md"
-                        />
-                      </div>
-                    </>
-                  )}
+               {formatData.attachedFile !== "vide" && (
+  <>
+    <h4 className="font-bold text-white m-4">
+      {translatedData["Fichier joint"] || "Attached File"}:
+    </h4>
+    <div className="flex flex-wrap justify-center gap-4 mt-4 mb-4">
+      {(() => {
+        if (Array.isArray(formatData.attachedFile)) {
+          return formatData.attachedFile.map((fileUrl, index) => (
+            <img
+              key={index}
+              alt={`Fichier joint ${index + 1}`}
+              src={fileUrl}
+              className="w-20 h-48 object-cover rounded-lg shadow-md cursor-pointer"
+              onClick={() => {
+                setOpenFullScreenImage(true);
+                setFullScreenImage(fileUrl);
+              }}
+            />
+          ));
+        }
+        else if (typeof formatData.attachedFile === 'string' && formatData.attachedFile.includes(',')) {
+          return formatData.attachedFile.split(',').map((fileUrl, index) => (
+            <img
+              key={index}
+              alt={`Fichier joint ${index + 1}`}
+              src={fileUrl.trim()}
+              className="w-20 h-48 ml-2 object-cover rounded-lg shadow-md cursor-pointer"
+              onClick={() => {
+                setOpenFullScreenImage(true);
+                setFullScreenImage(fileUrl.trim());
+              }}
+            />
+          ));
+        }
+        else {
+          return (
+            <img
+              alt="Fichier joint"
+              src={formatData.attachedFile}
+              className="w-20 h-48 ml-2 object-cover rounded-lg shadow-md cursor-pointer"
+              onClick={() => {
+                setOpenFullScreenImage(true);
+                setFullScreenImage(formatData.attachedFile);
+              }}
+            />
+          );
+        }
+      })()}
+    </div>
+  </>
+)}
                   <h5 className="font-bold text-white m-4">
                     {formatData.serviceSup !== 0 && (
                       <>

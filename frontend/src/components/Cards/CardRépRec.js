@@ -261,6 +261,26 @@ Suggérez une réponse appropriée , précis avec solution :`;
       toast.error("Une erreur s'est produite lors de l'envoi.");
     }
   };
+  useEffect(() => {
+    const fetchUserByReclamation = async () => {
+      try {
+        const response = await fetch(`${SummaryApi.getUserByReclamationId.url}/${id}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+  
+        const dataResponse = await response.json();
+        console.log("Data from API:", dataResponse); // Vérifiez les données reçues
+        setformatData(dataResponse?.data);
+      } catch (error) {
+        console.error("Erreur lors du chargement des données :", error);
+      }
+    };
+  
+    fetchUserByReclamation();
+  }, [id]);
 
   return (
     <>
@@ -329,7 +349,7 @@ Suggérez une réponse appropriée , précis avec solution :`;
                     <div className='text-slate-500 flex justify-center items-center flex-col gap-2'>
                       <span className='text-4xl'><FaCloudUploadAlt /></span>
                       <p className='text-sm'>Importer votre fichier</p>
-                      <input type='file' id='uploadImageInput' className='hidden' onChange={handleUploadFile} />
+                      <input type='file' id='uploadImageInput' accept="image/*" className='hidden' onChange={handleUploadFile} />
                     </div>
                   </div>
                 </label>

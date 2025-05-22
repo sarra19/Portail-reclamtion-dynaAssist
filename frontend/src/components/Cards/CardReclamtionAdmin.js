@@ -318,7 +318,12 @@ export default function CardReclamationAdmin() {
                 CurrentReclamation.map((reclamation, index) => (
                   <tr key={index} className="border-t hover:bg-gray-50 transition-colors">
                     <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-nowrap p-4">
-                      {new Date(reclamation.CreatedAt).toUTCString()}
+                      {new Date(reclamation.CreatedAt).toLocaleString('fr-FR', {
+  timeZone: 'UTC', // important !
+  dateStyle: 'full',
+  timeStyle: 'medium'
+})
+}
                     </td>
                     <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-nowrap p-4">
                       <i className="fas fa-file-alt text-gray-400 mr-2"></i>
