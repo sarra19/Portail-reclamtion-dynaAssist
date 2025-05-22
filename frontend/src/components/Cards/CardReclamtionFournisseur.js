@@ -411,7 +411,7 @@ export default function CardReclamationFournisseur() {
                 CurrentReclamation.map((reclamation, index) => (
                   <tr key={index} className="border-t hover:bg-gray-50 transition-colors">
                     <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-nowrap p-4">
-                      {reclamation.CreatedAt}
+                      {new Date(reclamation.CreatedAt).toUTCString()}
                     </td>
                     <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-nowrap p-4">
                       <i className="fas fa-file-alt text-gray-400 mr-2"></i>

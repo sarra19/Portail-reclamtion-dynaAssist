@@ -9,7 +9,7 @@ const DisplayImage = ({
   return (
     <div className='fixed bottom-0 top-0 right-0 left-0 flex justify-center items-center'>
 
-        <div className='bg-white shadow-lg rounded max-w-5xl mx-auto p-4'>
+        <div className='bg-white shadow-lg rounded w-20 mx-auto p-4'>
                 <div className='w-fit ml-auto text-2xl hover:text-pink-600 cursor-pointer' onClick={onClose}>
                     <CgClose/>
                 </div>

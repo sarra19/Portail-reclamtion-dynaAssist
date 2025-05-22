@@ -553,7 +553,7 @@ export default function CardTableRec({ color }) {
                 currentReclamations.map((reclamation, index) => (
                   <tr key={index} className="border-t">
                     <td className="border-t-0 text-center border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                      {reclamation.CreatedAt}
+                      {new Date(reclamation.CreatedAt).toUTCString()}
                     </td>
                     <td className="border-t-0 text-center border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                       {reclamation.Subject}

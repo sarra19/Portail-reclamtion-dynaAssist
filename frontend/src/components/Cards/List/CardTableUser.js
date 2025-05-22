@@ -45,6 +45,39 @@ export default function CardTableUser({ color }) {
       console.error("Error fetching users:", error);
     }
   };
+  const handleVerify = async (userId) => {
+    try {
+      const response = await fetch(`${SummaryApi.verifyAdmin.url}/${userId}`, {
+  method: SummaryApi.verifyAdmin.method,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+const contentType = response.headers.get("content-type");
+
+if (!response.ok) {
+  const text = await response.text(); // pour voir le HTML en erreur
+  console.error("Erreur brute :", text);
+  toast("Échec de la vérification. Détails dans la console.");
+  return;
+}
+
+if (contentType && contentType.includes("application/json")) {
+  const result = await response.json();
+  toast(result.message || "Utilisateur vérifié !");
+  fetchAllUser();
+} else {
+  const text = await response.text();
+  console.error("Réponse inattendue :", text);
+  toast("La réponse du serveur n'est pas au format JSON.");
+}
+
+    } catch (error) {
+      console.error("Erreur lors de la vérification :", error);
+      toast("Erreur serveur.");
+    }
+  };
 
   // Handle search
   const handleSearch = async () => {
@@ -556,40 +589,40 @@ export default function CardTableUser({ color }) {
             <thead>
               <tr>
                 <th className={`px-6 text-center border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left ${color === "light"
-                    ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                    : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700"
+                  ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                  : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700"
                   }`}  ></th>
                 <th >
                   <button className={`px-6 text-center border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left ${color === "light"
-                      ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                      : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700"
+                    ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                    : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700"
                     }`} onClick={() => handleSort("FirstName")}>
                     First Name {sortBy === "FirstName" && (order === "ASC" ? "↑" : "↓")}
                   </button>
                 </th>
                 <th >
                   <button className={`px-6 text-center border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left ${color === "light"
-                      ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                      : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700"
+                    ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                    : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700"
                     }`} onClick={() => handleSort("LastName")}>
                     Last Name {sortBy === "LastName" && (order === "ASC" ? "↑" : "↓")}
                   </button>
                 </th>
                 <th >
                   <button className={`px-6 text-center border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left ${color === "light"
-                      ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                      : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700"
+                    ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                    : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700"
                     }`} onClick={() => handleSort("Email")}>
                     Email {sortBy === "Email" && (order === "ASC" ? "↑" : "↓")}
                   </button>
                 </th>
                 <th className={`px-6 text-center border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left ${color === "light"
-                    ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                    : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700"
+                  ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                  : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700"
                   }`}  >Role</th>
                 <th className={`px-6 text-center border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left hide-for-pdf ${color === "light"
-                    ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                    : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700"
+                  ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                  : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700"
                   }`} >Actions</th>
               </tr>
             </thead>
@@ -621,7 +654,17 @@ export default function CardTableUser({ color }) {
                             <i className="fas fa-eye"></i>
                           </button>
                         </a>
+                        {user.Verified === 0 && (
+                         <button
+                        onClick={() => handleVerify(user.No_)}
+                        className="bg-green-500 text-white active:bg-green-600 font-bold uppercase text-xs px-2 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                        type="button"
+                      >
+                        <i className="fas fa-check"></i>
+                      </button>)}
                       </div>
+                     
+
                     </td>
                   </tr>
                 ))

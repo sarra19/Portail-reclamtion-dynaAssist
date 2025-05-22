@@ -356,8 +356,9 @@ export default function CardEditProd() {
                           type="file"
                           id="uploadImageInput"
                           className="hidden"
+                          accept="image/*"
+
                           onChange={handleUploadFile}
-                          accept="image/jpeg, image/png, image/gif, application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                         />
                       </div>
                     </div>

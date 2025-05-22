@@ -189,23 +189,7 @@ export default function CardAddRec() {
             toast.error("No file selected.");
             return;
         }
-        const allowedTypes = [
-            "image/jpeg",
-            "image/png",
-            "image/gif",
-            "application/pdf",
-            "application/msword",
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        ];
-        const maxSize = 5 * 1024 * 1024; // 5MB
-        if (!allowedTypes.includes(file.type)) {
-            toast.error("Invalid file type. Please upload an image (JPEG, PNG, GIF, PDF, DOC, DOCX).");
-            return;
-        }
-        if (file.size > maxSize) {
-            toast.error("File size exceeds the limit of 5MB.");
-            return;
-        }
+       
         setData((prev) => ({ ...prev, AttachedFile: [...prev.AttachedFile, file] }));
         toast.success("File selected successfully!");
     };
@@ -517,7 +501,7 @@ export default function CardAddRec() {
                                             <div className='text-slate-500 flex justify-center items-center flex-col gap-2'>
                                                 <span className='text-4xl'><FaCloudUploadAlt /></span>
                                                 <p className='text-sm'>Importer votre fichier</p>
-                                                <input type='file' id='uploadImageInput' className='hidden' onChange={handleUploadFile} />
+                                                <input type='file' id='uploadImageInput'  accept="image/*" className='hidden' onChange={handleUploadFile} />
                                             </div>
                                         </div>
                                     </label>
@@ -530,23 +514,18 @@ export default function CardAddRec() {
                                     {data.AttachedFile.length > 0 ? (
                                         <div className='flex items-center gap-2'>
                                             {data.AttachedFile.map((el, index) => {
-                                                const isDocument = [
-                                                    "application/pdf",
-                                                    "application/msword",
-                                                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                                                ].includes(el.type);
-                                                const defaultDocImage = require("assets/img/file.png");
+                                             
                                                 return (
                                                     <div className='relative group' key={index}>
                                                         <img
-                                                            src={isDocument ? defaultDocImage : URL.createObjectURL(el)}
+                                                            src={ URL.createObjectURL(el)}
                                                             alt={el.name}
                                                             width={80}
                                                             height={80}
                                                             className='bg-slate-100 border cursor-pointer'
                                                             onClick={() => {
                                                                 setOpenFullScreenImage(true);
-                                                                setFullScreenImage(isDocument ? defaultDocImage : URL.createObjectURL(el));
+                                                                setFullScreenImage( URL.createObjectURL(el));
                                                             }}
                                                         />
                                                         <p>{el.name}</p>

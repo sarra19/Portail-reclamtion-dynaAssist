@@ -6,12 +6,16 @@ import { toast, ToastContainer } from "react-toastify";
 import { useHistory } from "react-router-dom"; // Import useHistory for programmatic navigation
 import ChangeResponse from "../Modify/ChangeResponse";
 import { useSelector } from "react-redux";
+import DisplayImage from "helpers/DisplayImage";
 
 export default function CardDétailsReclamtion() {
   const { id } = useParams();
   const history = useHistory(); // For programmatic navigation
   const [showResponseModal, setShowResponseModal] = useState(false); // Controls the visibility of the response modal
   const [selectedResponse, setSelectedResponse] = useState(null); // Stores the selected response data
+  const [fullScreenImage, setFullScreenImage] = useState("");
+  const [openFullScreenImage, setOpenFullScreenImage] = useState(false);
+
   const [data, setData] = useState({
     TargetType: "",
     Name: "",
@@ -91,58 +95,58 @@ export default function CardDétailsReclamtion() {
 
   // Translate static UI text
   const translateStaticText = async (lang) => {
-  if (lang === "fr") {
-    return {
-      "Détails de Réclamation": "Détails de Réclamation",
-      Envoyeur: "Envoyeur",
-      Cible: "Cible",
-      Description: "Description",
-      Statut: "Statut",
-      "En cours": "En cours",
-      Traité: "Traité",
-      Résolu: "Résolu",
-      "Fichier joint": "Fichier joint",
-      "Envoyé le": "Envoyé le",
-      "et prévu le": "et prévu le", // Explicitly included
-      "Masquer réponse": "Masquer réponse",
-      "Voir réponse": "Voir réponse",
-      Réponse: "Réponse",
-      "Services supplémentaires": "Services supplémentaires",
-      Remboursement: "Remboursement",
-      "Intervention prévue le": "Intervention prévue le",
-      par: "par",
-    };
-  }
+    if (lang === "fr") {
+      return {
+        "Détails de Réclamation": "Détails de Réclamation",
+        Envoyeur: "Envoyeur",
+        Cible: "Cible",
+        Description: "Description",
+        Statut: "Statut",
+        "En cours": "En cours",
+        Traité: "Traité",
+        Résolu: "Résolu",
+        "Fichier joint": "Fichier joint",
+        "Envoyé le": "Envoyé le",
+        "et prévu le": "et prévu le", // Explicitly included
+        "Masquer réponse": "Masquer réponse",
+        "Voir réponse": "Voir réponse",
+        Réponse: "Réponse",
+        "Services supplémentaires": "Services supplémentaires",
+        Remboursement: "Remboursement",
+        "Intervention prévue le": "Intervention prévue le",
+        par: "par",
+      };
+    }
 
-  const staticTexts = [
-    "Détails de Réclamation",
-    "Envoyeur",
-    "Cible",
-    "Description",
-    "Statut",
-    "En cours",
-    "Traité",
-    "Résolu",
-    "Fichier joint",
-    "Envoyé le",
-    "et prévu le",
-    "Masquer réponse",
-    "Voir réponse",
-    "Réponse",
-    "Services supplémentaires",
-    "Remboursement",
-    "Intervention prévue le",
-    "par",
-  ];
+    const staticTexts = [
+      "Détails de Réclamation",
+      "Envoyeur",
+      "Cible",
+      "Description",
+      "Statut",
+      "En cours",
+      "Traité",
+      "Résolu",
+      "Fichier joint",
+      "Envoyé le",
+      "et prévu le",
+      "Masquer réponse",
+      "Voir réponse",
+      "Réponse",
+      "Services supplémentaires",
+      "Remboursement",
+      "Intervention prévue le",
+      "par",
+    ];
 
-  const translatedTexts = await translateTextBatch(staticTexts, lang);
-  const translatedStaticTexts = {};
-  staticTexts.forEach((text, index) => {
-    translatedStaticTexts[text] = translatedTexts[index] || text; // Fallback to original text
-  });
-  console.log("Translated static texts for language", lang, ":", translatedStaticTexts); // Debug log
-  return translatedStaticTexts;
-};
+    const translatedTexts = await translateTextBatch(staticTexts, lang);
+    const translatedStaticTexts = {};
+    staticTexts.forEach((text, index) => {
+      translatedStaticTexts[text] = translatedTexts[index] || text; // Fallback to original text
+    });
+    console.log("Translated static texts for language", lang, ":", translatedStaticTexts); // Debug log
+    return translatedStaticTexts;
+  };
 
   // Fetch complaint and response details
   useEffect(() => {
@@ -357,6 +361,10 @@ export default function CardDétailsReclamtion() {
                         alt="Fichier joint"
                         src={data.AttachedFile}
                         className="w-20 h-48 object-cover rounded-lg shadow-md"
+                        onClick={() => {
+                          setOpenFullScreenImage(true);
+                          setFullScreenImage(data.AttachedFile);
+                        }}
                       />
                     </div>
                   </>
@@ -528,6 +536,9 @@ export default function CardDétailsReclamtion() {
           />
         )}
       </div>
+      {openFullScreenImage && (
+        <DisplayImage onClose={() => setOpenFullScreenImage(false)} imgUrl={fullScreenImage} />
+      )}
     </>
   );
 }

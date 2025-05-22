@@ -70,6 +70,10 @@ const SummaryApi = {
         url: `${backendDomin}/updateReponse`,
         method: 'put'
     },
+    verifyAdmin: {
+        url:`${backendDomin}/verifyAdmin`, // sans l’ID ici, tu l’ajouteras dynamiquement
+        method: "put"
+    },
     searchServices: {
         url: `${backendDomin}/searchServices`,
         method: 'get'
@@ -111,11 +115,11 @@ const SummaryApi = {
         url: `${backendDomin}/getRemboursementsSender`,
         method: "GET",
     },
- getInterventionsByCurrentUser: {
+    getInterventionsByCurrentUser: {
         url: `${backendDomin}/getInterventionsByCurrentUser`,
         method: "GET",
     },
- 
+
     getRemboursementsByCurrentUser: {
         url: `${backendDomin}/getRemboursementsByCurrentUser`,
         method: 'get'
@@ -295,6 +299,10 @@ const SummaryApi = {
     },
     updateCallStatus: {
         url: `${backendDomin}/updateCallStatus`,
+        method: 'put'
+    },
+     updateComment: {
+        url: `${backendDomin}/updateCommentaire`,
         method: 'put'
     },
     startAudioCall: {

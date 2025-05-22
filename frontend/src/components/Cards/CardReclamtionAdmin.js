@@ -20,7 +20,7 @@ export default function CardReclamationAdmin() {
   const [order, setOrder] = useState("DESC"); // Default order: most recent first
 
   // Fetch current user details
-   const currentUser = useSelector(state => state?.user?.user)
+  const currentUser = useSelector(state => state?.user?.user)
 
 
   // Fetch received reclamations with sorting
@@ -62,7 +62,6 @@ export default function CardReclamationAdmin() {
         setAllReclamation(dataResponse.data);
       } else {
         setAllReclamation([]);
-        toast.error("Aucune donnée de Réclamation envoyée disponible.");
       }
     } catch (error) {
       console.error("Erreur lors de la récupération des Réclamations envoyées:", error);
@@ -228,11 +227,10 @@ export default function CardReclamationAdmin() {
           {["Boîte de réception", "Envoyé", "Archive"].map((tab) => (
             <button
               key={tab}
-              className={`px-4 py-2 rounded-t-lg text-sm font-bold uppercase ${
-                mainTab === tab
+              className={`px-4 py-2 rounded-t-lg text-sm font-bold uppercase ${mainTab === tab
                   ? "bg-orange-dys text-white shadow-md"
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
+                }`}
               onClick={() => {
                 setMainTab(tab);
                 setStatusFilter("all");
@@ -250,7 +248,7 @@ export default function CardReclamationAdmin() {
             </button>
           ))}
         </div>
-   {(mainTab === "Boîte de réception" || mainTab === "Envoyé") && (
+        {(mainTab === "Boîte de réception" || mainTab === "Envoyé") && (
           <div className="flex justify-center space-x-4 px-4 py-3 bg-gray-50">
             {[
               { value: "all", label: "Tous", icon: "filter", className: "mr-1 bg-transparent text-bleu-dys hover:bg-gray-300", activeClassName: "bg-bleu-dys text-white" },
@@ -261,9 +259,8 @@ export default function CardReclamationAdmin() {
               <button
                 key={filter.value}
                 onClick={() => setStatusFilter(filter.value)}
-                className={`flex items-center px-4 py-2 rounded-full text-xs font-bold uppercase shadow hover:shadow-md transition-all duration-200 ${
-                  statusFilter === filter.value ? filter.activeClassName : filter.className
-                }`}
+                className={`flex items-center px-4 py-2 rounded-full text-xs font-bold uppercase shadow hover:shadow-md transition-all duration-200 ${statusFilter === filter.value ? filter.activeClassName : filter.className
+                  }`}
               >
                 <i className={`fas fa-${filter.icon} mr-2`}></i>
                 {filter.label}
@@ -321,7 +318,7 @@ export default function CardReclamationAdmin() {
                 CurrentReclamation.map((reclamation, index) => (
                   <tr key={index} className="border-t hover:bg-gray-50 transition-colors">
                     <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-nowrap p-4">
-                      {reclamation.CreatedAt}
+                      {new Date(reclamation.CreatedAt).toUTCString()}
                     </td>
                     <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-nowrap p-4">
                       <i className="fas fa-file-alt text-gray-400 mr-2"></i>
@@ -329,28 +326,26 @@ export default function CardReclamationAdmin() {
                     </td>
                     <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                       <button
-                        className={`rounded-full py-1 px-3 text-xs font-bold uppercase ${
-                          reclamation.Status === 0
+                        className={`rounded-full py-1 px-3 text-xs font-bold uppercase ${reclamation.Status === 0
                             ? "bg-yellow-500 text-white"
                             : reclamation.Status === 1
-                            ? "bg-orange-dys text-white"
-                            : "bg-green-500 text-white"
-                        }`}
+                              ? "bg-orange-dys text-white"
+                              : "bg-green-500 text-white"
+                          }`}
                       >
                         <i
-                          className={`fas ${
-                            reclamation.Status === 0
+                          className={`fas ${reclamation.Status === 0
                               ? "fa-clock"
                               : reclamation.Status === 1
-                              ? "fa-check-circle"
-                              : "fa-check-double"
-                          } mr-1`}
+                                ? "fa-check-circle"
+                                : "fa-check-double"
+                            } mr-1`}
                         ></i>
                         {reclamation.Status === 0
                           ? "En cours"
                           : reclamation.Status === 1
-                          ? "Traitée"
-                          : "Résolue"}
+                            ? "Traitée"
+                            : "Résolue"}
                       </button>
                     </td>
                     <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-nowrap p-4">
@@ -360,74 +355,71 @@ export default function CardReclamationAdmin() {
                     <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-nowrap p-4 space-x-2">
                       {currentUser?.Role !== 1 && (
                         <>
-                         {mainTab === "Boîte de réception" && (
-    <>
-      {(reclamation.Status === 0 || reclamation.Status === 1) && (
-        <a href={`/réponse-réclamations/${reclamation.No_}`}>
-          <button
-            className="bg-transparent border border-solid hover:text-white active:bg-lightBlue-600 font-bold uppercase text-xs px-4 py-2 rounded"
-          >
-            <i className="fas fa-reply mr-1"></i> Répondre
-          </button>
-        </a>
-      )}
-      {reclamation.Status === 2 && (
-        <button
-          className="bg-transparent border border-solid font-bold uppercase text-xs px-4 py-2 rounded mr-2"
-          onClick={() => ArchiveRec(reclamation.No_)}
-        >
-          <i className="fas fa-folder mr-1"></i> Archiver
-        </button>
-      )}
-    </>
-  )}
-  {/* Archive tab: Desarchive for archived reclamations */}
-  {mainTab === "Archive" && reclamation.Archived === 1 && (
-    <button
-      className="bg-transparent border border-solid font-bold uppercase text-xs px-4 py-2 rounded mr-2"
-      onClick={() => desArchiveRec(reclamation.No_)}
-    >
-      <i className="fas fa-folder-open mr-1"></i> Désarchiver
-    </button>
-  )}
-  {/* Envoyé tab: Edit and Delete buttons */}
-  {mainTab === "Envoyé" && (
-    <>
-      <button
-        className="bg-green-500 hover:bg-green-600 text-white font-bold uppercase text-xs px-4 py-2 rounded-full"
-        onClick={() => {
-          setSelectedReclamation(reclamation);
-          setShowModal(true);
-        }}
-      >
-        <i className="fas fa-edit"></i>
-      </button>
-      <button
-        className="ml-1 bg-red-500 hover:bg-red-600 text-white font-bold uppercase text-xs px-4 py-2 rounded-full"
-        onClick={() => deleteSentReclamation(reclamation.No_)}
-      >
-        <i className="fas fa-trash"></i>
-      </button>
-    </>
-  )}
-  {/* View Details button: Always shown */}
- <a href={`/détails-réclamations/${reclamation.No_}`}>
-  <button
-    className="ml-1 bg-bleu-dys hover:bg-blue-600 text-white font-bold uppercase text-xs px-4 py-2 rounded-full shadow hover:shadow-md"
-    onClick={(e) => {
-      // Only update status if:
-      // 1. Not in "Envoyé" tab (it's a received reclamation)
-      // 2. Status is not already "Résolue" (2)
-      // 3. User is not a regular user (Role !== 1)
-      if (mainTab !== "Envoyé" && reclamation.Status !== 2 ) {
-        updateStatus(reclamation.No_);
-       
-      }
-    }}
-  >
-    <i className="fas fa-eye"></i>
-  </button>
-</a>
+                          {mainTab === "Boîte de réception" && (
+                            <>
+                              {(reclamation.Status === 0 || reclamation.Status === 1) && (
+                                <a href={`/réponse-réclamations/${reclamation.No_}`}>
+                                  <button
+                                    className="bg-transparent border border-solid hover:text-white active:bg-lightBlue-600 font-bold uppercase text-xs px-4 py-2 rounded"
+                                  >
+                                    <i className="fas fa-reply mr-1"></i> Répondre
+                                  </button>
+                                </a>
+                              )}
+                              {reclamation.Status === 2 && (
+                                <button
+                                  className="bg-transparent border border-solid font-bold uppercase text-xs px-4 py-2 rounded mr-2"
+                                  onClick={() => ArchiveRec(reclamation.No_)}
+                                >
+                                  <i className="fas fa-folder mr-1"></i> Archiver
+                                </button>
+                              )}
+                            </>
+                          )}
+                          {/* Archive tab: Desarchive for archived reclamations */}
+                          {mainTab === "Archive" && reclamation.Archived === 1 && (
+                            <button
+                              className="bg-transparent border border-solid font-bold uppercase text-xs px-4 py-2 rounded mr-2"
+                              onClick={() => desArchiveRec(reclamation.No_)}
+                            >
+                              <i className="fas fa-folder-open mr-1"></i> Désarchiver
+                            </button>
+                          )}
+                          {/* Envoyé tab: Edit and Delete buttons */}
+                          {mainTab === "Envoyé" && (
+                            <>
+                              <button
+                                className="bg-green-500 hover:bg-green-600 text-white font-bold uppercase text-xs px-4 py-2 rounded-full"
+                                onClick={() => {
+                                  setSelectedReclamation(reclamation);
+                                  setShowModal(true);
+                                }}
+                              >
+                                <i className="fas fa-edit"></i>
+                              </button>
+                              <button
+                                className="ml-1 bg-red-500 hover:bg-red-600 text-white font-bold uppercase text-xs px-4 py-2 rounded-full"
+                                onClick={() => deleteSentReclamation(reclamation.No_)}
+                              >
+                                <i className="fas fa-trash"></i>
+                              </button>
+                            </>
+                          )}
+                          {/* View Details button: Always shown */}
+                          <a href={`/détails-réclamations/${reclamation.No_}`}>
+                            <button
+                              className="ml-1 bg-bleu-dys hover:bg-blue-600 text-white font-bold uppercase text-xs px-4 py-2 rounded-full shadow hover:shadow-md"
+                              onClick={(e) => {
+                               
+                                if (mainTab !== "Envoyé" && reclamation.Status !== 2) {
+                                  updateStatus(reclamation.No_);
+
+                                }
+                              }}
+                            >
+                              <i className="fas fa-eye"></i>
+                            </button>
+                          </a>
                         </>
                       )}
                     </td>
@@ -459,11 +451,10 @@ export default function CardReclamationAdmin() {
               <button
                 key={number}
                 onClick={() => setCurrentPage(number)}
-                className={`w-8 h-8 flex items-center justify-center rounded-full ${
-                  currentPage === number
+                className={`w-8 h-8 flex items-center justify-center rounded-full ${currentPage === number
                     ? "bg-orange-dys text-white shadow-md"
                     : "bg-white text-blue-500 border border-blue-300 hover:bg-blue-50"
-                }`}
+                  }`}
               >
                 {number}
               </button>

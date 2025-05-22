@@ -16,7 +16,20 @@ const CardCalendrierFrontClient = () => {
   const [showModal, setShowModal] = useState(false);
   const [activeTab, setActiveTab] = useState("remboursements");
   const [beneficiaryDetails, setBeneficiaryDetails] = useState(null);
-
+  const fetchUserDetailsInterv = async (intervId) => {
+    try {
+      const response = await fetch(`${SummaryApi.getUserDetailsByInterventionId.url}/${intervId}`, {
+        method: SummaryApi.getUserDetailsByInterventionId.method,
+        headers: { "Content-Type": "application/json" },
+      });
+      if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
+      const data = await response.json();
+      setBeneficiaryDetails(data.data);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des détails du bénéficiaire:", error);
+      toast.error("Erreur lors de la récupération des détails du bénéficiaire.");
+    }
+  };
   const fetchUserDetails = async (rembId) => {
     try {
       const response = await fetch(`${SummaryApi.getUserDetailsByRembId.url}/${rembId}`, {
@@ -109,7 +122,7 @@ const CardCalendrierFrontClient = () => {
       setSelectedIntervention(null);
     } else if (eventDetails.type === "intervention") {
       const InterventionNo = eventDetails.details.InterventionNo;
-      fetchUserDetails(InterventionNo);
+      fetchUserDetailsInterv(InterventionNo);
       setSelectedIntervention(eventDetails.details);
       setSelectedRemb(null);
     }

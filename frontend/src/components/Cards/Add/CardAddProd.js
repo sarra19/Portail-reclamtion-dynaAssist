@@ -387,7 +387,7 @@ export default function CardAddProd() {
               <div className="w-full px-4">
                 <div className="relative w-full mb-3">
                   <label htmlFor="uploadImageInput" className="block uppercase text-blueGray-600 text-xs font-bold mb-2">
-                    Document :
+                    Image :
                   </label>
                   <label htmlFor="uploadImageInput">
                     <div className="p-2 bg-slate-100 border rounded h-32 w-full flex justify-center items-center cursor-pointer">
@@ -399,6 +399,7 @@ export default function CardAddProd() {
                         <input
                           type="file"
                           id="uploadImageInput"
+                          accept="image/*"
                           className="hidden"
                           onChange={handleUploadFile}
                           multiple

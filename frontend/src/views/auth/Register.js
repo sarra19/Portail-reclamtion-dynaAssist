@@ -237,6 +237,8 @@ const detectFaces = async () => {
           ProfileImage: '',
         });
         setDescriptors([]);
+            setSelectedFile('');
+
         setImageSrc(null);
       } else if (dataApi.error) {
         toast.error(dataApi.message);
@@ -297,16 +299,22 @@ return (
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Profile Image Upload */}
-          <div className="w-16 h-16 mx-auto relative overflow-hidden rounded-full mb-4">
-            <img
-              src={selectedFile ? URL.createObjectURL(selectedFile) : loginIcons}
-              alt="profile"
-              className="object-cover w-full h-full"
-            />
-            <label className="absolute inset-0 cursor-pointer">
-              <input type="file" className="hidden" onChange={handleUploadFile} accept="image/*" />
-            </label>
-          </div>
+         <div className="w-16 h-16 mx-auto relative overflow-hidden rounded-full mb-4">
+  <label className="absolute inset-0 cursor-pointer z-10">
+    <img
+      src={selectedFile ? URL.createObjectURL(selectedFile) : loginIcons}
+      alt="profile"
+      className="object-cover w-full h-full pointer-events-none"
+    />
+    <input
+      type="file"
+      className="hidden"
+      onChange={handleUploadFile}
+      accept="image/*"
+    />
+  </label>
+</div>
+
 
           {/* Name Fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

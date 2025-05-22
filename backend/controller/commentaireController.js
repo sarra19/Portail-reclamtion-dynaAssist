@@ -3,7 +3,6 @@ const { sql, connectDB } = require("../config/dbConfig")
 async function add(req, res) {
     try {
         const userId = req.userId;
-
         if (!userId) {
             return res.status(401).json({ message: "Utilisateur non authentifié" });
         }
@@ -60,116 +59,116 @@ async function add(req, res) {
     }
 }
 
- async function CountCommentService(req, res) {
+async function CountCommentService(req, res) {
     try {
-      const { ServiceId, UserId } = req.query;
-  
-      if (!ServiceId || !UserId) {
-        return res.status(400).json({
-          success: false,
-          message: "ServiceID and UserId are required.",
-        });
-      }
-  
-      const pool = await connectDB();
-  
-      const checkLikeQuery = `
+        const { ServiceId, UserId } = req.query;
+
+        if (!ServiceId || !UserId) {
+            return res.status(400).json({
+                success: false,
+                message: "ServiceID and UserId are required.",
+            });
+        }
+
+        const pool = await connectDB();
+
+        const checkLikeQuery = `
         SELECT * FROM [dbo].[CRONUS International Ltd_$Comment$deddd337-e674-44a0-998f-8ddd7c79c8b2] c
 
         WHERE UserId = @UserId AND ServiceId = @ServiceId
       `;
-  
-      const checkCommentResult = await pool.request()
-        .input('UserId', sql.NVarChar, UserId)
-        .input('ServiceId', sql.NVarChar, ServiceId)
-        .query(checkLikeQuery);
-  
-      const totalCommentQuery = `
+
+        const checkCommentResult = await pool.request()
+            .input('UserId', sql.NVarChar, UserId)
+            .input('ServiceId', sql.NVarChar, ServiceId)
+            .query(checkLikeQuery);
+
+        const totalCommentQuery = `
         SELECT COUNT(*) AS totalComment 
         FROM [dbo].[CRONUS International Ltd_$Comment$deddd337-e674-44a0-998f-8ddd7c79c8b2] c
 
         WHERE ServiceId = @ServiceId
       `;
-  
-      const totalCommentResult = await pool.request()
-        .input('ServiceId', sql.NVarChar, ServiceId)
-        .query(totalCommentQuery);
-  
-      const isComment = checkCommentResult.recordset.length > 0; 
-      const totalComment = totalCommentResult.recordset[0].totalComment; 
-  
-      res.status(200).json({
-        success: true,
-        data: {
-          isComment,
-          comments: totalComment,
-        },
-      });
-    } catch (err) {
-      console.error("Error fetching like status:", err);
-      res.status(500).json({
-        success: false,
-        message: "Failed to fetch like status.",
-        error: err.message,
-      });
-    }
-  }
 
+        const totalCommentResult = await pool.request()
+            .input('ServiceId', sql.NVarChar, ServiceId)
+            .query(totalCommentQuery);
 
-  async function CountCommentProduct(req, res) {
-    try {
-      const { ProductId, UserId } = req.query;
-  
-      if (!ProductId || !UserId) {
-        return res.status(400).json({
-          success: false,
-          message: "ProductId and UserId are required.",
+        const isComment = checkCommentResult.recordset.length > 0;
+        const totalComment = totalCommentResult.recordset[0].totalComment;
+
+        res.status(200).json({
+            success: true,
+            data: {
+                isComment,
+                comments: totalComment,
+            },
         });
-      }
-  
-      const pool = await connectDB();
-  
-      const checkLikeQuery = `
+    } catch (err) {
+        console.error("Error fetching like status:", err);
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch like status.",
+            error: err.message,
+        });
+    }
+}
+
+
+async function CountCommentProduct(req, res) {
+    try {
+        const { ProductId, UserId } = req.query;
+
+        if (!ProductId || !UserId) {
+            return res.status(400).json({
+                success: false,
+                message: "ProductId and UserId are required.",
+            });
+        }
+
+        const pool = await connectDB();
+
+        const checkLikeQuery = `
         SELECT * FROM [dbo].[CRONUS International Ltd_$Comment$deddd337-e674-44a0-998f-8ddd7c79c8b2] c
 
         WHERE UserId = @UserId AND ProductId = @ProductId
       `;
-  
-      const checkCommentResult = await pool.request()
-        .input('UserId', sql.NVarChar, UserId)
-        .input('ProductId', sql.NVarChar, ProductId)
-        .query(checkLikeQuery);
-  
-      const totalCommentQuery = `
+
+        const checkCommentResult = await pool.request()
+            .input('UserId', sql.NVarChar, UserId)
+            .input('ProductId', sql.NVarChar, ProductId)
+            .query(checkLikeQuery);
+
+        const totalCommentQuery = `
         SELECT COUNT(*) AS totalComment 
         FROM [dbo].[CRONUS International Ltd_$Comment$deddd337-e674-44a0-998f-8ddd7c79c8b2] c
 
         WHERE ProductId = @ProductId
       `;
-  
-      const totalCommentResult = await pool.request()
-        .input('ProductId', sql.NVarChar, ProductId)
-        .query(totalCommentQuery);
-  
-      const isComment = checkCommentResult.recordset.length > 0; 
-      const totalComment = totalCommentResult.recordset[0].totalComment; 
-  
-      res.status(200).json({
-        success: true,
-        data: {
-          isComment,
-          comments: totalComment,
-        },
-      });
+
+        const totalCommentResult = await pool.request()
+            .input('ProductId', sql.NVarChar, ProductId)
+            .query(totalCommentQuery);
+
+        const isComment = checkCommentResult.recordset.length > 0;
+        const totalComment = totalCommentResult.recordset[0].totalComment;
+
+        res.status(200).json({
+            success: true,
+            data: {
+                isComment,
+                comments: totalComment,
+            },
+        });
     } catch (err) {
-      console.error("Error fetching like status:", err);
-      res.status(500).json({
-        success: false,
-        message: "Failed to fetch like status.",
-        error: err.message,
-      });
+        console.error("Error fetching like status:", err);
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch like status.",
+            error: err.message,
+        });
     }
-  }
+}
 
 async function getall(req, res) {
 
@@ -198,16 +197,68 @@ async function getall(req, res) {
     }
 }
 async function updateCommentaire(req, res) {
-    // try {
-    //     await commentaireModel.findByIdAndUpdate(
-    //         req.params.id,
-    //         req.body);
-    //     res.status(200).send("data updated")
+    try {
+        const userId = req.userId; // Id de l'utilisateur connecté
+                console.log("userId :", userId)
 
-    // } catch (err) {
-    //     res.status(400).json(err);
-    // }
+        const commentId = req.params.id; // ID du commentaire à modifier
+        const { Content, AttachedFile, Status } = req.body; // Champs modifiables
+
+        if (!userId) {
+            return res.status(401).json({ message: "Utilisateur non authentifié" });
+        }
+
+        if (!Content) {
+            return res.status(400).json({ message: "Le contenu du commentaire est requis." });
+        }
+
+        const pool = await connectDB();
+
+        // Vérifier que le commentaire existe et appartient à l'utilisateur
+        const existingCommentResult = await pool.request()
+            .input('No_', sql.NVarChar, commentId)
+            .input('UserId', sql.NVarChar, userId)
+            .query(`
+                SELECT * FROM [dbo].[CRONUS International Ltd_$Comment$deddd337-e674-44a0-998f-8ddd7c79c8b2]
+                WHERE [No_] = @No_ AND [UserId] = @UserId
+            `);
+
+        if (existingCommentResult.recordset.length === 0) {
+            return res.status(404).json({ message: "Commentaire non trouvé ou accès refusé." });
+        }
+
+        // Mise à jour du commentaire
+        await pool.request()
+            .input('Content', sql.NVarChar, Content)
+            .input('AttachedFile', sql.NVarChar, AttachedFile || "")
+            .input('Status', sql.Int, 1)
+            .input('No_', sql.NVarChar, commentId)
+            .input('UserId', sql.NVarChar, userId)
+            .query(`
+                UPDATE [dbo].[CRONUS International Ltd_$Comment$deddd337-e674-44a0-998f-8ddd7c79c8b2]
+                SET 
+                    [Content] = @Content,
+                    [AttachedFile] = @AttachedFile,
+                    [Status] = @Status
+                WHERE [No_] = @No_ AND [UserId] = @UserId
+            `);
+
+        res.status(200).json({
+            success: true,
+            message: "Commentaire mis à jour avec succès.",
+            data: {
+                No_: commentId,
+                Content,
+                AttachedFile,
+                Status
+            }
+        });
+    } catch (err) {
+        console.error("Erreur lors de la mise à jour du commentaire:", err);
+        res.status(500).json({ message: "Erreur serveur", error: err.message });
+    }
 }
+
 async function getbyid(req, res) {
     try {
         const pool = await connectDB();
@@ -374,4 +425,4 @@ async function getCommentsByProduct(req, res) {
 
 
 
-module.exports = { add, getall,CountCommentProduct, getbyid,CountCommentService, getCommentsByService, getCommentsByProduct, updateCommentaire, deleteComment }
+module.exports = { add, getall, CountCommentProduct, getbyid, CountCommentService, getCommentsByService, getCommentsByProduct, updateCommentaire, deleteComment }

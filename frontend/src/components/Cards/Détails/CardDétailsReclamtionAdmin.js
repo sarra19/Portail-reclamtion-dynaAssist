@@ -4,10 +4,12 @@ import SummaryApi from "api/common";
 import { useParams } from 'react-router-dom';
 import { ToastContainer } from "react-toastify";
 import { useSelector } from "react-redux";
+import DisplayImage from "helpers/DisplayImage";
 
 export default function CardDétailsReclamtion() {
   const { id } = useParams();
-
+  const [openFullScreenImage, setOpenFullScreenImage] = useState(false);
+  const [fullScreenImage, setFullScreenImage] = useState(null);
   const [data, setData] = useState({
     TargetType: "",
     Name: "",
@@ -151,7 +153,7 @@ export default function CardDétailsReclamtion() {
                   </p>
                 </div>
               )}
-                {data.VoiceNote && (
+                {data.VoiceNote !== "vide" && (
                   <div className="space-y-2 m-4">
                     <h4 className="font-bold text-white">Note vocale:</h4>
                     <audio controls src={data.VoiceNote} className="mx-auto center mt-3 w-50" />
@@ -181,6 +183,10 @@ export default function CardDétailsReclamtion() {
                         alt="Fichier joint"
                         src={data.AttachedFile}
                         className="w-20 h-48 object-cover rounded-lg shadow-md"
+                         onClick={() => {
+                          setOpenFullScreenImage(true);
+                          setFullScreenImage(data.AttachedFile);
+                        }}
                       />
                     </div>
                   </>
@@ -263,7 +269,9 @@ export default function CardDétailsReclamtion() {
           Retour
         </button>
       </a>
-
+ {openFullScreenImage && (
+            <DisplayImage onClose={() => setOpenFullScreenImage(false)} imgUrl={fullScreenImage} />
+          )}
     </>
   );
 }

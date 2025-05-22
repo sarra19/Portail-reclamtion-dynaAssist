@@ -8,33 +8,48 @@ async function getall(req, res) {
         const pool = await connectDB();
 
         const query = `
-            SELECT TOP (1000) 
-                p.[timestamp], 
-                p.[No_], 
-                p.[Montant], 
-                p.[DatePrevu], 
-                p.[ReponseId], 
-                p.[$systemId], 
-                p.[$systemCreatedAt], 
-                p.[$systemCreatedBy], 
-                p.[$systemModifiedAt], 
-                p.[$systemModifiedBy],
-
-
-                r.[Subject] AS SujetReclamation, -- Sujet de la réclamation
-                r.[Sender] AS Beneficiaire -- Bénéficiaire (expéditeur de la réclamation)
+            SELECT 
+                p.[No_] AS PaybackNo, 
+                p.[Montant] AS MontantPayback, 
+                p.[DatePrevu] AS DatePrevue, 
+                r.[Subject] AS SujetReclamation,
+                r.[TargetType] as TypeCible,
+                r.[Name] as NomCible,
+                r.[Sender] AS Beneficiaire, 
+                r.[Receiver] AS Destinataire,
+                r.[Status] AS ReclamationStatus,
+                r.[Archived] AS ReclamationArchived,
+                r.[UserId] AS ReclamationUserId
             FROM [Demo Database BC (24-0)].[dbo].[CRONUS International Ltd_$Payback$deddd337-e674-44a0-998f-8ddd7c79c8b2] p
-LEFT JOIN                [dbo].[CRONUS International Ltd_$Reclamation$deddd337-e674-44a0-998f-8ddd7c79c8b2] AS r
-            ON 
-                p.[ReponseId] = r.[No_] -- Jointure sur l'ID de la réponse
+            INNER JOIN [Demo Database BC (24-0)].[dbo].[CRONUS International Ltd_$ResponseReclamation$deddd337-e674-44a0-998f-8ddd7c79c8b2] resp
+                ON p.[ReponseId] = resp.[No_]
+            INNER JOIN [Demo Database BC (24-0)].[dbo].[CRONUS International Ltd_$Reclamation$deddd337-e674-44a0-998f-8ddd7c79c8b2] r
+                ON resp.[ReclamationId] = r.[No_]
         `;
 
         const result = await pool.request().query(query);
 
-        res.status(200).send(result.recordset);
+        if (result.recordset.length === 0) {
+            return res.status(404).send({ message: "Aucun remboursement trouvé vous concernant." });
+        }
+
+        const formattedEvents = result.recordset.map(remboursement => ({
+            id: remboursement.PaybackNo,
+            title: `${remboursement.SujetReclamation} - ${remboursement.MontantPayback} dt`,
+            start: remboursement.DatePrevue,
+            details: remboursement,
+            ReclamationUserId: remboursement.ReclamationUserId,
+            TypeCible: remboursement.TypeCible,
+            NomCible: remboursement.NomCible,
+        }));
+
+        res.status(200).send(formattedEvents);
     } catch (err) {
-        console.error("Erreur lors de la récupération des rembourssements:", err);
-        res.status(400).send({ message: "Erreur lors de la récupération des rembourssements", error: err.message });
+        console.error("Erreur lors de la récupération des remboursements :", err);
+        res.status(500).send({
+            message: "Erreur serveur lors de la récupération des remboursements.",
+            error: err.message
+        });
     }
 }
 

@@ -14,8 +14,8 @@ table 50112 "Comment"
         }
         field(3; "Status"; Option)
         {
-            OptionMembers = deleted,published,edited;
-            OptionCaption = 'Deleted,Published,Edited';
+            OptionMembers = published,edited;
+            OptionCaption = 'Published,Edited';
             InitValue = published;
         }
          field(4; "AttachedFile"; Text[255])

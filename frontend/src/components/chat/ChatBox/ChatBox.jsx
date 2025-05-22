@@ -19,7 +19,14 @@ const ChatBox = ({ chat, currentUser, setSendMessage, receivedMessage }) => {
   const [editingMessage, setEditingMessage] = useState(null); // State for editing a message
   const scroll = useRef();
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-
+useEffect(() => {
+  if (receivedMessage) {
+    // Vérifiez si le message reçu appartient au chat actuel
+    if (receivedMessage.chatId === chat?.No_) {
+      setMessages(prev => [...prev, receivedMessage]);
+    }
+  }
+}, [receivedMessage, chat?.No_]);
   // Fetch user data
   useEffect(() => {
     const fetchUserData = async () => {

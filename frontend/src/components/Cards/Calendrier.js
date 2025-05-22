@@ -2,125 +2,117 @@ import React, { useEffect, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
+import frLocale from "@fullcalendar/core/locales/fr";
 import SummaryApi from "api/common";
-
 import { toast } from "react-toastify";
 import InterventionDetailsModal from "./Détails/InterventionDetailsModal";
 
 const Calendrier = () => {
-  const [events, setEvents] = useState([]);
-  const [selectedIntervention, setSelectedIntervention] = useState(null); // Stocke les détails de l'intervention sélectionnée
-  const [showModal, setShowModal] = useState(false); // Gère l'affichage de la modale
-  const [beneficiaryDetails, setBeneficiaryDetails] = useState(null); // Stocke les détails du bénéficiaire
+  const [eventsInterventions, setEventsInterventions] = useState([]);
+  const [selectedIntervention, setSelectedIntervention] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [beneficiaryDetails, setBeneficiaryDetails] = useState(null);
 
-  // Récupérer toutes les interventions pour le calendrier
-  const fetchInterventions = async () => {
+  const fetchUserDetails = async (intervId) => {
     try {
-      const response = await fetch(SummaryApi.allInterventions.url, {
-        method: SummaryApi.allInterventions.method,
+      const response = await fetch(`${SummaryApi.getUserDetailsByInterventionId.url}/${intervId}`, {
+        method: SummaryApi.getUserDetailsByInterventionId.method,
         headers: { "Content-Type": "application/json" },
       });
-
-      if (!response.ok) {
-        throw new Error(`Erreur HTTP: ${response.status}`);
-      }
-
+      if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
       const data = await response.json();
-
-      // Formater les données pour FullCalendar
-      const formattedEvents = data.map((intervention) => ({
-        title: `${intervention.SujetReclamation} - ${intervention.TechnicienResponsable}`,
-        start: intervention.DatePrevuInterv, // Date de l'intervention
-        id: intervention.No_, // ID unique pour chaque événement
-        details: intervention, // Ajouter les détails complets de l'intervention
-      }));
-
-      setEvents(formattedEvents);
+      setBeneficiaryDetails(data.data);
     } catch (error) {
-      console.error("Erreur lors de la récupération des interventions:", error);
+      console.error("Erreur lors de la récupération des détails du bénéficiaire:", error);
+      toast.error("Erreur lors de la récupération des détails du bénéficiaire.");
+    }
+  };
+
+  // Interventions pour l'onglet Interventions
+  const allInterventions= async () => {
+    try {
+      const response = await fetch(`${SummaryApi.allInterventions.url}`, {
+        method: SummaryApi.allInterventions.method,
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      });
+      if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
+      const data = await response.json();
+      
+      if (!Array.isArray(data)) throw new Error("Format de données incorrect");
+
+      const formatted = data.map((interv) => ({
+        id: interv.id,
+        title: interv.title || interv.details.SujetReclamation,
+        start: interv.start || interv.details.DatePrevueInterv,
+        details: interv.details,
+        type: "intervention",
+        color: "#2980B9", // bleu foncé
+      }));
+      setEventsInterventions(formatted); // Mettre à jour les interventions seulement
+    } catch (error) {
+      console.error("Erreur fetchInterventionsSender ou vide ");
       toast.error("Erreur lors du chargement des interventions.");
     }
   };
 
-
-
-  // Charger les interventions au montage du composant
   useEffect(() => {
-    fetchInterventions();
+    allInterventions();
   }, []);
- const fetchInterventionDetails = async (interventionId) => {
-    try {
-      console.log("Fetching intervention ID:", interventionId); // Debug
-      const response = await fetch(`${SummaryApi.getIntervention.url}/${interventionId}`, {
-        method: SummaryApi.getIntervention.method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
 
-      if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
-
-      const data = await response.json();
-      console.log("Intervention details response:", data); // Debug
-      setSelectedIntervention(data);
-    } catch (error) {
-      console.error("Erreur:", error);
+  const handleEventClick = (info) => {
+    const eventDetails = info.event.extendedProps;
+    if (!eventDetails || !eventDetails.details) {
+      toast.error("Détails de l'événement manquants.");
+      return;
     }
-};
 
-const fetchUserDetails = async (interv) => {
-    try {
-      console.log("Fetching user details for intervention ID:", interv); // Debug
-      const response = await fetch(`${SummaryApi.getUserDetailsByInterventionId.url}/${interv}`, {
-        method: SummaryApi.getUserDetailsByInterventionId.method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+  
+      const InterventionNo = eventDetails.details.InterventionNo;
+      fetchUserDetails(InterventionNo);
+      setSelectedIntervention(eventDetails.details);
 
-      if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
 
-      const data = await response.json();
-      console.log("User details response:", data); // Debug
-      setBeneficiaryDetails(data.data); 
-    } catch (error) {
-      console.error("Erreur:", error);
-    }
-};
-
-  // Gestionnaire de clic sur un événement
-  const handleEventClick = async (info) => {
-    const eventDetails = info.event.extendedProps.details; // Récupérer les détails complets
-    await fetchInterventionDetails(eventDetails.No_); // Récupérer les détails de l'intervention
-    await fetchUserDetails(eventDetails.No_); // Récupérer les détails du bénéficiaire
-
-    setShowModal(true); // Ouvrir la modale
+    setShowModal(true);
   };
 
   return (
     <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Calendrier des Interventions</h2>
+      <h2 className="text-xl font-bold mb-4">Calendrier Admin</h2>
+
+      {/* Tabs */}
+    
+
+      {/* Calendar */}
       <FullCalendar
         plugins={[dayGridPlugin, timeGridPlugin]}
         initialView="dayGridMonth"
-        events={events}
-        eventClick={handleEventClick} // Gérer le clic sur un événement
+        events={eventsInterventions}
+        eventClick={handleEventClick}
         headerToolbar={{
           left: "prev,next today",
           center: "title",
           right: "dayGridMonth,timeGridWeek,timeGridDay",
         }}
         height="auto"
+        locale={frLocale}
+        buttonText={{
+          today: "Aujourd'hui",
+          month: "Mois",
+          week: "Semaine",
+          day: "Jour",
+        }}
       />
 
-      {/* Afficher la modale si showModal est vrai */}
+      {/* Modals */}
       {showModal && selectedIntervention && (
-        <InterventionDetailsModal
+        <InterventionDetailsModal 
           selectedIntervention={selectedIntervention}
           beneficiaryDetails={beneficiaryDetails}
-          setShowModal={setShowModal}
+          setShowModal={setShowModal} 
         />
       )}
+     
     </div>
   );
 };

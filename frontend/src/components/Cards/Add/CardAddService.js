@@ -138,26 +138,7 @@ Aucun texte introductif ni mot technique ("Tags", "pgi", "erp", etc.)
       return;
     }
 
-    const allowedTypes = [
-      "image/jpeg",
-      "image/png",
-      "image/gif",
-      "application/pdf",
-      "application/msword",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    ];
-    const maxSize = 5 * 1024 * 1024;
-
-    for (const file of files) {
-      if (!allowedTypes.includes(file.type)) {
-        toast.error("Type de fichier non valide. Veuillez télécharger une image ou un document.");
-        return;
-      }
-      if (file.size > maxSize) {
-        toast.error("La taille du fichier dépasse la limite de 5 Mo.");
-        return;
-      }
-    }
+ 
 
     setData(prev => ({
       ...prev,
@@ -260,9 +241,8 @@ Aucun texte introductif ni mot technique ("Tags", "pgi", "erp", etc.)
                     name="Name"
                     value={data.Name}
                     onChange={handleInputChange}
-                    className={`border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150 ${
-                      errors.Name ? "border-red-500 border" : ""
-                    }`}
+                    className={`border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150 ${errors.Name ? "border-red-500 border" : ""
+                      }`}
                     placeholder="Nom de Service"
                   />
                   {errors.Name && <p className="text-red-500 text-xs mt-1">{errors.Name}</p>}
@@ -279,9 +259,8 @@ Aucun texte introductif ni mot technique ("Tags", "pgi", "erp", etc.)
                     name="Tags"
                     value={data.Tags}
                     onChange={handleInputChange}
-                    className={`border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150 ${
-                      errors.Tags ? "border-red-500 border" : ""
-                    }`}
+                    className={`border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150 ${errors.Tags ? "border-red-500 border" : ""
+                      }`}
                     placeholder="Tags seront générés automatiquement"
                   />
                   {errors.Tags && <p className="text-red-500 text-xs mt-1">{errors.Tags}</p>}
@@ -303,6 +282,8 @@ Aucun texte introductif ni mot technique ("Tags", "pgi", "erp", etc.)
                         <input
                           type="file"
                           id="uploadImageInput"
+                          accept="image/*"  // Seulement les images de tous types
+
                           className="hidden"
                           onChange={handleUploadFile}
                           multiple
@@ -315,25 +296,20 @@ Aucun texte introductif ni mot technique ("Tags", "pgi", "erp", etc.)
                   {data.Image.length > 0 && (
                     <div className="flex items-center gap-2 mt-2">
                       {data.Image.map((el, index) => {
-                        const isDocument = [
-                          "application/pdf",
-                          "application/msword",
-                          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                        ].includes(el.type);
-                        const defaultDocImage = require("assets/img/file.png");
+
 
                         return (
                           <div className="relative group" key={index}>
                             <img
-                              src={isDocument ? defaultDocImage : URL.createObjectURL(el)}
-                              alt={el.name}
-                              width={80}
-                              height={80}
-                              className="bg-slate-100 border cursor-pointer"
-                              onClick={() => {
-                                setOpenFullScreenImage(true);
-                                setFullScreenImage(isDocument ? defaultDocImage : URL.createObjectURL(el));
-                              }}
+                              src={URL.createObjectURL(el)}
+                            alt={el.name}
+                            width={80}
+                            height={80}
+                            className="bg-slate-100 border cursor-pointer"
+                            onClick={() => {
+                              setOpenFullScreenImage(true);
+                              setFullScreenImage(URL.createObjectURL(el));
+                            }}
                             />
                             <p className="text-xs">{el.name}</p>
                             <div

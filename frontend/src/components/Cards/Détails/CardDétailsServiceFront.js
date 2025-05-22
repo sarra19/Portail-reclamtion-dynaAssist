@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import SummaryApi from '../../../api/common';
 import { useParams } from 'react-router-dom';
-import { FaSmile, FaPaperclip, FaThumbsUp, FaTimes, FaComment, FaTrash } from 'react-icons/fa';
+import { FaSmile, FaPaperclip, FaThumbsUp, FaTimes, FaComment, FaTrash, FaEdit } from 'react-icons/fa';
 import EmojiPicker from 'emoji-picker-react';
 import { toast } from 'react-toastify';
 import { ToastContainer } from 'react-toastify';
@@ -23,6 +23,11 @@ export default function CardDétailsServiceFront() {
   const [newComment, setNewComment] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const currentUser = useSelector(state => state?.user?.user)
+
+  // Dans le scope de votre composant
+
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [editedContent, setEditedContent] = useState("");
 
 
   const fetchLikeStatus = async () => {
@@ -262,6 +267,38 @@ export default function CardDétailsServiceFront() {
       console.error("Erreur lors du chargement des commentaires :", error);
     }
   };
+  const handleUpdateComment = async (commentId) => {
+    if (!editedContent.trim()) {
+      toast.error("Le contenu du commentaire ne peut pas être vide");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${SummaryApi.updateComment.url}/${commentId}`, {
+        method: SummaryApi.updateComment.method,
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          Content: editedContent,
+          // Add other fields if needed (Status, AttachedFile)
+        }),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        toast.success("Commentaire mis à jour avec succès");
+        setEditingCommentId(null);
+        fetchComments(); // Refresh comments
+      } else {
+        toast.error(result.message);
+      }
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour du commentaire:", error);
+      toast.error("Erreur lors de la mise à jour");
+    }
+  };
   useEffect(() => {
 
 
@@ -431,40 +468,80 @@ export default function CardDétailsServiceFront() {
                 {comments.length > 0 ? (
                   comments.map((comment, index) => (
                     <div key={index} className="flex items-center space-x-2 mt-4 justify-between">
-                      <div>
-                        <div className="flex items-center space-x-2 mt-4 ">
+                      <div className="w-full">
+                        <div className="flex items-center space-x-2 mt-4">
                           <img
                             src={comment.user?.ProfileImage}
                             alt="User Avatar"
                             className="w-8 h-8 mr-2 rounded-full"
                           />
-                          <div>
-                            <p className="text-gray-800 font-semibold">{comment.user?.FirstName} {comment.user?.LastName}</p>
-                            <p className="text-gray-500 text-sm">{comment.Content}</p>
-                            {comment.AttachedFile && comment.AttachedFile.trim() !== "" && (
-                              <img
-                                src={comment.AttachedFile}
-                                alt="Attached File"
-                                width={80}
-                                height={80}
-                                className="bg-slate-100 border cursor-pointer"
-                              />
+                          <div className="w-full">
+                            {editingCommentId === comment.No_ ? (
+                              <>
+                                <textarea
+                                  value={editedContent}
+                                  onChange={(e) => setEditedContent(e.target.value)}
+                                  className="block mt-4 mx-2 p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                  placeholder="Modifier le commentaire..."
+                                  rows={2}
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter" && !e.shiftKey) {
+                                      e.preventDefault();
+                                      handleUpdateComment(comment.No_);
+                                    }
+                                  }}
+                                />
+                                <button
+                                  onClick={() => handleUpdateComment(comment.No_)}
+                                  className="text-orange-dys font-bold hover:text-green-700 text-sm"
+                                >
+                                  Sauvegarder
+                                </button>
+
+                              </>
+                            ) : (
+                              <>
+                                <p className="text-gray-800 font-semibold">{comment.user?.FirstName} {comment.user?.LastName}</p>
+                                <p className="text-gray-500 text-sm">{comment.Content}</p>
+                                {comment.AttachedFile && comment.AttachedFile.trim() !== "" && (
+                                  <img
+                                    src={comment.AttachedFile}
+                                    alt="Attached File"
+                                    width={80}
+                                    height={80}
+                                    className="bg-slate-100 border cursor-pointer"
+                                  />
+                                )}
+                                <p className="text-gray-400 text-xs mt-1">{timeAgo(comment.CreatedAt)}</p>
+                              </>
                             )}
-                            <p className="text-gray-400 text-xs mt-1">{timeAgo(comment.CreatedAt)}</p>
                           </div>
                         </div>
                       </div>
+
                       {(currentUser?.No_ === comment.UserId || currentUser?.Role === 0) && (
-                        <button
-                          onClick={() => handleDeleteComment(comment.No_)}
-                          className="text-red-500 hover:text-red-700 p-1"
-                        >
-                          <FaTrash className="w-4 h-4" />
-                        </button>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => {
+                              setEditingCommentId(comment.No_);
+                              setEditedContent(comment.Content);
+                            }}
+                            className="ml-2 text-blueGray-500 hover:text-blueGray-700 p-1 mr-1"
+                          >
+                            <FaEdit className="w-4 h-4" />
+                          </button>
+
+
+                          <button
+                            onClick={() => handleDeleteComment(comment.No_)}
+                            className="text-red-300 hover:text-red-500  p-1"
+                          >
+                            <FaTrash className="w-4 h-4" />
+                          </button>
+                        </div>
                       )}
-
-
                     </div>
+
                   ))
                 ) : (
                   <p className="text-center text-gray-500 w-full">Aucun commentaire disponible.</p>
@@ -549,7 +626,7 @@ export default function CardDétailsServiceFront() {
       </div>
 
     </div>
-    
+
 
   );
 

@@ -23,7 +23,7 @@ async function insertReclamationAndNotify(pool, transaction, {
             ([TargetType], [Name], [Subject], [ComplaintType], [AttachedFile], [Content], [VoiceNote], [UserId], [Status], [ServiceId], [ProductId], [CreatedAt], [Receiver], [Sender])
             OUTPUT INSERTED.No_
             VALUES 
-            (@TargetType, @Name, @Subject, @ComplaintType, @AttachedFile, @Content, @VoiceNote, @UserId, @Status, @ServiceId, @ProductId, @CreatedAt, @Receiver, @Sender)
+            (@TargetType, @Name, @Subject, @ComplaintType, @AttachedFile, @Content, @VoiceNote, @UserId, @Status, @ServiceId, @ProductId, GETDATE(), @Receiver, @Sender)
         `;
 
         const reclamationResult = await transaction.request()
@@ -38,7 +38,6 @@ async function insertReclamationAndNotify(pool, transaction, {
             .input('ServiceId', sql.NVarChar, ServiceId)
             .input('ProductId', sql.NVarChar, ProductId)
             .input('Status', sql.Int, 0)
-            .input('CreatedAt', sql.DateTime, new Date())
             .input('Receiver', sql.NVarChar, ReceiverId)
             .input('Sender', sql.NVarChar, Sender)
             .query(reclamationQuery);
@@ -583,12 +582,10 @@ async function RecievedRec(req, res) {
 }
 async function mesReclamations(req, res) {
     try {
-        // Récupération de l'ID utilisateur
         console.log("userId", req.userId);
 
         const pool = await connectDB();
 
-        // Récupérer les paramètres de tri de la requête
         const { sortBy, order } = req.query;
 
         // Validation des paramètres de tri

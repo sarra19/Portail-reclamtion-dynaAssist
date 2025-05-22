@@ -362,7 +362,7 @@ export default function CardTableInterv({ color }) {
           </div>
           {/* PDF Download Button */}
           <div className="ml-4">
-            <a href={`/admin/remb-calendrier`}>
+            <a href={`/admin/calendrier`}>
 
               <button
                 className="bg-lightBlue-500 text-white active:bg-orange-dys font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"

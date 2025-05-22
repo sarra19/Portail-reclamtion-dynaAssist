@@ -3,36 +3,53 @@ const { sql, connectDB } = require("../config/dbConfig")
 
 async function getall(req, res) {
     try {
-        const pool = await connectDB(); // Connexion à la base de données
 
-        // Requête SQL pour récupérer toutes les interventions avec le sujet de la réclamation et le bénéficiaire
+        const pool = await connectDB();
+
         const query = `
             SELECT 
-                i.[No_],
-                i.[DatePrevuInterv],
+                i.[No_] AS InterventionNo,
+                i.[DatePrevuInterv] AS DatePrevueInterv,
                 i.[TechnicienResponsable],
-                i.[ReponseId],
-                i.[$systemId],
-                i.[$systemCreatedAt],
-                i.[$systemCreatedBy],
-                i.[$systemModifiedAt],
-                i.[$systemModifiedBy],
-                r.[Subject] AS SujetReclamation, -- Sujet de la réclamation
-                r.[Sender] AS Beneficiaire -- Bénéficiaire (expéditeur de la réclamation)
-            FROM 
-                [dbo].[CRONUS International Ltd_$Intervention$deddd337-e674-44a0-998f-8ddd7c79c8b2] AS i
-LEFT JOIN                [dbo].[CRONUS International Ltd_$Reclamation$deddd337-e674-44a0-998f-8ddd7c79c8b2] AS r
-            ON 
-                i.[ReponseId] = r.[No_] -- Jointure sur l'ID de la réponse
+                r.[Subject] AS SujetReclamation,
+                r.[Sender] AS Beneficiaire,
+                 r.[TargetType] as TypeCible,
+                r.[Name] as NomCible,
+                r.[Receiver] AS Destinataire,
+                r.[Status] AS ReclamationStatus,
+                r.[Archived] AS ReclamationArchived,
+                r.[UserId] AS ReclamationUserId
+            FROM [dbo].[CRONUS International Ltd_$Intervention$deddd337-e674-44a0-998f-8ddd7c79c8b2] i
+            INNER JOIN [Demo Database BC (24-0)].[dbo].[CRONUS International Ltd_$ResponseReclamation$deddd337-e674-44a0-998f-8ddd7c79c8b2] resp
+                ON i.[ReponseId] = resp.[No_]
+            INNER JOIN [Demo Database BC (24-0)].[dbo].[CRONUS International Ltd_$Reclamation$deddd337-e674-44a0-998f-8ddd7c79c8b2] r
+                ON resp.[ReclamationId] = r.[No_]
         `;
 
-        const result = await pool.request().query(query);
+        const result = await pool.request()
+            .query(query);
 
-        // Envoyer les données récupérées en réponse
-        res.status(200).send(result.recordset);
+        if (result.recordset.length === 0) {
+            return res.status(404).send({ message: "Aucune intervention trouvée pour cet utilisateur." });
+        }
+
+        const formattedEvents = result.recordset.map(intervention => ({
+            id: intervention.InterventionNo,
+            title: intervention.SujetReclamation,
+            start: intervention.DatePrevueInterv,
+            details: intervention,
+            ReclamationUserId: intervention.ReclamationUserId,
+            TargetType: intervention.TypeCible,
+            NomCible: intervention.NomCible,
+        }));
+
+        res.status(200).send(formattedEvents);
     } catch (err) {
-        console.error("Erreur lors de la récupération des interventions:", err);
-        res.status(400).send({ message: "Erreur lors de la récupération des interventions", error: err.message });
+        console.error("Erreur lors de la récupération des interventions pour l'utilisateur :", err);
+        res.status(500).send({
+            message: "Erreur serveur lors de la récupération des interventions.",
+            error: err.message
+        });
     }
 }
 

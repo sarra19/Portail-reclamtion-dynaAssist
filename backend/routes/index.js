@@ -76,7 +76,7 @@ router.get("/getAllCommentaire",commentaireController.getall)
 router.get("/getCommentaire/:id",commentaireController.getbyid)
 router.get("/getCommentsByService/:id",commentaireController.getCommentsByService)
 router.get("/getCommentsByProduct/:id",commentaireController.getCommentsByProduct)
-router.put('/updateCommentaire/:id',commentaireController.updateCommentaire);
+router.put('/updateCommentaire/:id',authToken,commentaireController.updateCommentaire);
 router.delete('/deleteComment/:id',authToken,commentaireController.deleteComment);
 router.get("/CountCommentService",commentaireController.CountCommentService)
 router.get("/CountCommentProduct",commentaireController.CountCommentProduct)
@@ -176,6 +176,8 @@ router.get('/sortUsers', userController.sortUsers);
 // Face-based login endpoint
 router.post("/signup",validateSignUp,userController.SignUp)
 router.get("/:id/verify/:token/", userController.userVerify)
+router.put("/verifyAdmin/:id", userController.userVerifyAdmin)
+
 router.post("/signin",userController.SignIn)
 router.post("/SignInFace",userController.SignInFace)
 router.get("/userLogout",userController.userLogout)

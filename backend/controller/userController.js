@@ -268,7 +268,47 @@ async function userVerify(req, res) {
         res.status(500).send({ message: "Erreur de serveur" });
     }
 }
+async function userVerifyAdmin(req, res) {
+  try {
+    const pool = await connectDB();
+    const userId = req.params.id;
 
+    // Vérifier si l'utilisateur existe
+    const userResult = await pool.request()
+      .input('No_', sql.NVarChar, userId)
+      .query(`
+        SELECT * 
+        FROM [CRONUS International Ltd_$User_Details$deddd337-e674-44a0-998f-8ddd7c79c8b2]
+        WHERE [No_] = @No_
+      `);
+
+    if (userResult.recordset.length === 0) {
+      return res.status(404).json({ message: "Utilisateur inexistant" });
+    }
+
+    // Vérifier si l'utilisateur est déjà vérifié
+    const existingUser = userResult.recordset[0];
+    if (existingUser.Verified === true || existingUser.Verified === 1) {
+      return res.status(200).json({ message: "Utilisateur déjà vérifié" });
+    }
+
+    // Mise à jour de la vérification
+    await pool.request()
+      .input('No_', sql.NVarChar, userId)
+      .input('Verified', sql.TinyInt, true) // 1 pour vrai
+      .query(`
+        UPDATE [CRONUS International Ltd_$User_Details$deddd337-e674-44a0-998f-8ddd7c79c8b2]
+        SET [Verified] = @Verified
+        WHERE [No_] = @No_
+      `);
+
+    return res.status(200).json({ message: "Utilisateur vérifié avec succès" });
+
+  } catch (error) {
+    console.error("Erreur lors de la vérification de l'utilisateur :", error);
+    return res.status(500).json({ message: "Erreur serveur" });
+  }
+}
 async function SignIn(req, res) {
     try {
       const { Email, Password } = req.body;
@@ -1023,4 +1063,4 @@ async function getUserStats(req, res) {
 }
 
   
-module.exports = { SignUp,getUserStats,sortUsers,findUsers,SignInFace,getUserDetailsByInterventionId,getUserDetailsByRembId, getVendors, userVerify, getUserByReclamationId, getUser, updateUser, userDetails, updateUserRole, SignIn, userLogout, getall, deleteUser }
+module.exports = { SignUp,getUserStats,sortUsers,userVerifyAdmin,findUsers,SignInFace,getUserDetailsByInterventionId,getUserDetailsByRembId, getVendors, userVerify, getUserByReclamationId, getUser, updateUser, userDetails, updateUserRole, SignIn, userLogout, getall, deleteUser }

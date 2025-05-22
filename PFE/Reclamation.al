@@ -53,7 +53,7 @@ table 50111 "Reclamation"
         {
             NotBlank = false;
         }
-        field(13; "CreatedAt"; Text[50])
+        field(13; "CreatedAt"; Date)
         {
         }
          field(14; "Receiver"; Text[50])

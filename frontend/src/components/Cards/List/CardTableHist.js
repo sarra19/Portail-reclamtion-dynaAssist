@@ -487,7 +487,8 @@ export default function CardTableHist({ color }) {
                 CurrentHistory.map((history, index) => (
                   <tr key={index} className="border-t">
                     <td className="border-t-0 text-center border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                      {new Date(history.ActivityDate).toLocaleString()}
+                      {new Date(history.ActivityDate).toUTCString()
+}
                     </td>
                     <td className="border-t-0 text-center border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                       {users[history.UserId]

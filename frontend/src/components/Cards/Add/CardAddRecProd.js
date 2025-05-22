@@ -52,13 +52,13 @@ export default function CardAddRec() {
     const handleContentChange = (e) => {
         const newContent = e.target.value;
         setData((prev) => ({ ...prev, Content: newContent }));
-        
+
         // Only fetch suggestions if content is meaningful
         if (newContent.length > 10) {
             const debounceTimer = setTimeout(() => {
                 fetchSuggestions(newContent);
             }, 1000);
-            
+
             return () => clearTimeout(debounceTimer);
         } else {
             setSuggestions([]);
@@ -94,10 +94,10 @@ export default function CardAddRec() {
             setIsLoadingSuggestions(false);
         }
     };
-   
+
 
     // Fetch current user details
-   const currentUser = useSelector(state => state?.user?.user)
+    const currentUser = useSelector(state => state?.user?.user)
 
 
     // Fetch product details
@@ -193,23 +193,7 @@ export default function CardAddRec() {
             toast.error("No file selected.");
             return;
         }
-        const allowedTypes = [
-            "image/jpeg",
-            "image/png",
-            "image/gif",
-            "application/pdf",
-            "application/msword",
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        ];
-        const maxSize = 5 * 1024 * 1024; // 5MB
-        if (!allowedTypes.includes(file.type)) {
-            toast.error("Invalid file type. Please upload an image (JPEG, PNG, GIF), PDF, DOC, or DOCX.");
-            return;
-        }
-        if (file.size > maxSize) {
-            toast.error("File size exceeds the limit of 5MB.");
-            return;
-        }
+
         setData((prev) => ({ ...prev, AttachedFile: [...prev.AttachedFile, file] }));
         toast.success("File selected successfully!");
     };
@@ -431,7 +415,7 @@ export default function CardAddRec() {
                             <div className="w-full lg:w-6/12 px-4">
                                 <div className="relative w-full mb-3">
                                     {/* Helper Text */}
-                                   
+
                                     <label className="block uppercase text-blueGray-600 text-xs font-bold mb-2" htmlFor="Subject">
                                         Sujet
                                     </label>
@@ -444,9 +428,8 @@ export default function CardAddRec() {
                                             name="Subject"
                                             onChange={handleSujetChange}
                                             value={data.Subject}
-                                            className={`border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150 ${
-                                                errors.Subject ? "border-red-500" : ""
-                                            }`}
+                                            className={`border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150 ${errors.Subject ? "border-red-500" : ""
+                                                }`}
                                         >
                                             <option value="">Sélectionnez un sujet</option>
                                             {SubjectsReclamation.map((sujet, index) => (
@@ -468,9 +451,8 @@ export default function CardAddRec() {
                                                     }
                                                 }}
                                                 placeholder="Saisir un sujet personnalisé"
-                                                className={`border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150 ${
-                                                    errors.Subject ? "border-red-500" : ""
-                                                }`}
+                                                className={`border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150 ${errors.Subject ? "border-red-500" : ""
+                                                    }`}
                                             />
                                             {!showAutreInput && (
                                                 <button
@@ -493,7 +475,7 @@ export default function CardAddRec() {
                             <div className="w-full lg:w-6/12 px-4">
                                 <div className="relative w-full mb-3">
                                     {/* Helper Text */}
-                                    
+
                                     <label className="block uppercase text-blueGray-600 text-xs font-bold mb-2">
                                         Type de Réclamation
                                     </label>
@@ -503,9 +485,8 @@ export default function CardAddRec() {
                                     <select
                                         value={ComplaintType}
                                         onChange={handleReclamationTypeChange}
-                                        className={`border-0 px-3 py-3 text-blueGray-600 bg-white rounded text-sm shadow w-full ${
-                                            errors.ComplaintType ? "border-red-500" : ""
-                                        }`}
+                                        className={`border-0 px-3 py-3 text-blueGray-600 bg-white rounded text-sm shadow w-full ${errors.ComplaintType ? "border-red-500" : ""
+                                            }`}
                                     >
                                         <option value="0">Textuelle</option>
                                         <option value="1">Vocal</option>
@@ -520,19 +501,25 @@ export default function CardAddRec() {
                             <div className="w-full lg:w-12/12 px-4">
                                 <div className="relative w-full mb-3">
                                     {/* Helper Text */}
-                                    
+
                                     <label htmlFor='uploadImageInput' className='mt-3'>Document :</label>
                                     <label htmlFor='uploadImageInput'>
                                         <div className='p-2 bg-slate-100 border rounded h-32 w-full flex justify-center items-center cursor-pointer'>
                                             <div className='text-slate-500 flex justify-center items-center flex-col gap-2'>
                                                 <span className='text-4xl'><FaCloudUploadAlt /></span>
                                                 <p className='text-sm'>Importer votre fichier</p>
-                                                <input type='file' id='uploadImageInput' className='hidden' onChange={handleUploadFile} />
+                                                <input
+                                                    type='file'
+                                                    id='uploadImageInput'
+                                                    accept="image/*"  // Seulement les images de tous types
+                                                    className='hidden'
+                                                    onChange={handleUploadFile}
+                                                />
                                             </div>
                                         </div>
                                     </label>
                                     <p className="text-xs text-gray-600 mb-1">
-                                        Importez un fichier pertinent (JPEG, PNG, GIF, PDF, DOC, DOCX).
+                                        Importez un fichier pertinent (JPEG, PNG).
                                     </p>
                                     {errors.AttachedFile && (
                                         <p className="text-red-500 text-xs mt-1">{errors.AttachedFile}</p>
@@ -542,23 +529,18 @@ export default function CardAddRec() {
                                     {data.AttachedFile.length > 0 ? (
                                         <div className='flex items-center gap-2'>
                                             {data.AttachedFile.map((el, index) => {
-                                                const isDocument = [
-                                                    "application/pdf",
-                                                    "application/msword",
-                                                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                                                ].includes(el.type);
-                                                const defaultDocImage = require("assets/img/file.png");
+
                                                 return (
                                                     <div className='relative group' key={index}>
                                                         <img
-                                                            src={isDocument ? defaultDocImage : URL.createObjectURL(el)}
+                                                            src={URL.createObjectURL(el)}
                                                             alt={el.name}
                                                             width={80}
                                                             height={80}
                                                             className='bg-slate-100 border cursor-pointer'
                                                             onClick={() => {
                                                                 setOpenFullScreenImage(true);
-                                                                setFullScreenImage(isDocument ? defaultDocImage : URL.createObjectURL(el));
+                                                                setFullScreenImage(URL.createObjectURL(el));
                                                             }}
                                                         />
                                                         <p>{el.name}</p>
@@ -584,7 +566,7 @@ export default function CardAddRec() {
                                 <div className="w-full lg:w-12/12 px-4">
                                     <div className="relative w-full mb-3">
                                         {/* Helper Text */}
-                                        
+
                                         <label className="block uppercase text-blueGray-600 text-xs font-bold mb-2" htmlFor="description">
                                             Description
                                         </label>
@@ -595,35 +577,34 @@ export default function CardAddRec() {
                                             id="Content"
                                             value={data.Content}
                                             name="Content"
-                                            className={`border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150 ${
-                                                errors.Content ? "border-red-500" : ""
-                                            }`}
+                                            className={`border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150 ${errors.Content ? "border-red-500" : ""
+                                                }`}
                                             onChange={handleContentChange}
                                             placeholder="Je me permets de vous contacter pour exprimer mon mécontentement concernant..."
                                             rows="4"
                                         ></textarea>
-                                                               {showSuggestions && suggestions.length > 0 && !isLoadingSuggestions && (
-                <div className="mt-2">
-                    <div className="flex items-center mb-1">
-                        <span className="text-xs font-semibold text-gray-600">Suggestions:</span>
-                        <button
-                            type="button"
-                            onClick={openSuggestionsModal} // Ouvrir le modal
-                            className="ml-2 text-xs text-black hover:text-gray-700"
-                        >
-                            Voir toutes les suggestions
-                        </button>
-                    </div>
-                </div>
-            )}
+                                        {showSuggestions && suggestions.length > 0 && !isLoadingSuggestions && (
+                                            <div className="mt-2">
+                                                <div className="flex items-center mb-1">
+                                                    <span className="text-xs font-semibold text-gray-600">Suggestions:</span>
+                                                    <button
+                                                        type="button"
+                                                        onClick={openSuggestionsModal} // Ouvrir le modal
+                                                        className="ml-2 text-xs text-black hover:text-gray-700"
+                                                    >
+                                                        Voir toutes les suggestions
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
 
-            {/* Modal de suggestions */}
-            <SuggestionsModal
-                isOpen={isSuggestionsModalOpen}
-                onClose={closeSuggestionsModal}
-                suggestions={suggestions}
-               
-            />
+                                        {/* Modal de suggestions */}
+                                        <SuggestionsModal
+                                            isOpen={isSuggestionsModalOpen}
+                                            onClose={closeSuggestionsModal}
+                                            suggestions={suggestions}
+
+                                        />
                                         {errors.Content && (
                                             <p className="text-red-500 text-xs mt-1">{errors.Content}</p>
                                         )}
@@ -631,41 +612,41 @@ export default function CardAddRec() {
                                 </div>
                             ) : (
                                 <div className="w-full lg:w-12/12 px-4 flex flex-col items-center">
-                                <div className="relative w-full mb-3 text-center">
-                                    {/* Helper Text */}
-                                    <label className="block uppercase text-blueGray-600 text-xs font-bold mb-2">
-                                        Enregistrement Vocal
-                                    </label>
-                                    <p className="text-xs text-gray-600 mb-1">
-                                        Appuyez sur le bouton pour enregistrer votre message vocal.
-                                    </p>
-                                    <button
-                                        type="button"
-                                        onClick={isRecording ? stopRecording : startRecording}
-                                        className={`text-black font-bold px-6 py-3 rounded-full shadow-lg transition-all ${isRecording ? "bg-red-600" : "bg-orange-dys"} hover:opacity-80`}
-                                    >
-                                        <i className={`fas fa-microphone text-white text-lg ${isRecording ? "animate-pulse" : ""}`}></i>
-                                    </button>
-                                    {audioBlob && (
-                                        <div className="mt-4 w-full">
-                                            <audio controls src={URL.createObjectURL(audioBlob)} className="w-full max-w-xs mx-auto" />
-                                            {isTranscribing && (
-                                                <p className="text-sm text-gray-600 mt-2">Transcription en cours...</p>
-                                            )}
-                                            {data.Content && (
-                                                <>
-                                                    <label className="block uppercase text-blueGray-600 text-xs font-bold mb-2 mt-4">
-                                                        Transcription
-                                                    </label>
-                                                    <div className="border-0 px-3 py-3 text-blueGray-600 bg-white rounded text-sm shadow w-full">
-                                                        {data.Content}
-                                                    </div>
-                                                </>
-                                            )}
-                                        </div>
-                                    )}
+                                    <div className="relative w-full mb-3 text-center">
+                                        {/* Helper Text */}
+                                        <label className="block uppercase text-blueGray-600 text-xs font-bold mb-2">
+                                            Enregistrement Vocal
+                                        </label>
+                                        <p className="text-xs text-gray-600 mb-1">
+                                            Appuyez sur le bouton pour enregistrer votre message vocal.
+                                        </p>
+                                        <button
+                                            type="button"
+                                            onClick={isRecording ? stopRecording : startRecording}
+                                            className={`text-black font-bold px-6 py-3 rounded-full shadow-lg transition-all ${isRecording ? "bg-red-600" : "bg-orange-dys"} hover:opacity-80`}
+                                        >
+                                            <i className={`fas fa-microphone text-white text-lg ${isRecording ? "animate-pulse" : ""}`}></i>
+                                        </button>
+                                        {audioBlob && (
+                                            <div className="mt-4 w-full">
+                                                <audio controls src={URL.createObjectURL(audioBlob)} className="w-full max-w-xs mx-auto" />
+                                                {isTranscribing && (
+                                                    <p className="text-sm text-gray-600 mt-2">Transcription en cours...</p>
+                                                )}
+                                                {data.Content && (
+                                                    <>
+                                                        <label className="block uppercase text-blueGray-600 text-xs font-bold mb-2 mt-4">
+                                                            Transcription
+                                                        </label>
+                                                        <div className="border-0 px-3 py-3 text-blueGray-600 bg-white rounded text-sm shadow w-full">
+                                                            {data.Content}
+                                                        </div>
+                                                    </>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
                             )}
                         </div>
 
