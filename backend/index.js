@@ -55,7 +55,7 @@ app.use(
       saveUninitialized: false,
       cookie: {
           httpOnly: true, // Empêche l'accès aux cookies côté client
-          secure: false, // Set to true only if using HTTPS
+          secure: true, // Set to true only if using HTTPS
           sameSite: "none", // Assurez-vous que c'est bien en minuscule
           maxAge: 1000 * 60 * 60 * 24, // Durée de vie du cookie (1 jour)
       },
@@ -100,10 +100,10 @@ let activeUsers = [];
 
 io.on("connection", (socket) => {
   
-  socket.on("joinRoom", (roomID) => {
-    socket.join(roomID);
-    console.log(`User joined room: ${roomID}`);
-});
+//   socket.on("joinRoom", (roomID) => {
+//     socket.join(roomID);
+//     console.log(`User joined room: ${roomID}`);
+// });
 
     // add new User
     socket.on("new-user-add", (newUserId) => {
