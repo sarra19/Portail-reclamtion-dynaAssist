@@ -275,7 +275,7 @@ async function findOrCreateUser(req, res) {
         const tokenOption = {
             httpOnly: true,
             secure: true, // Ensure this matches your environment (true for HTTPS, false for HTTP)
-            SameSite: 'None',
+            SameSite: 'Lax',
             maxAge: 1000 * 60 * 60 * 24, // 1 day
         };
 
