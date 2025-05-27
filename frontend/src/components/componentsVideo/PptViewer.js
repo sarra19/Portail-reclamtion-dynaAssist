@@ -71,7 +71,7 @@ function PresentationViewer({ roomId }) {
       formData.append('roomId', roomId);
 
       const [pptResponse] = await Promise.all([
-        axios.post('http://localhost:8081/uploadPpt', formData, {
+        axios.post('https://claimflow.onrender.com/uploadPpt', formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         }),
       ]);

@@ -66,7 +66,7 @@ export default function CardAddProd() {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${process.env.REACT_APP_OPENROUTER_API_KEY}`,
-          "HTTP-Referer": process.env.REACT_APP_SITE_URL || "http://localhost:3000",
+          "HTTP-Referer": process.env.REACT_APP_SITE_URL || "https://portail-reclamtion-mern-erp.onrender.com",
           "X-Title": "Tag Generator App",
         },
         body: JSON.stringify({

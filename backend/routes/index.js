@@ -284,7 +284,7 @@ async function findOrCreateUser(req, res) {
         // Redirect to the frontend application with the token
         const profileImage = user.ProfileImage ? encodeURIComponent(user.ProfileImage) : '';
 
-        res.redirect(`http://localhost:3000/?token=${token}${profileImage ? `&profileImage=${profileImage}` : ''}`);
+        res.redirect(`https://portail-reclamtion-mern-erp.onrender.com/?token=${token}${profileImage ? `&profileImage=${profileImage}` : ''}`);
         } catch (error) {
         console.error("Error in findOrCreateUser:", error);
 
