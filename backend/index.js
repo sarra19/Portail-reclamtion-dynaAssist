@@ -18,7 +18,7 @@ const indexRouter = require('./routes/index');
 const passport = require("passport"); // Import the actual Passport library
 
 app.use(cors({
-    origin: ["http://localhost:8081","http://localhost:3000"], // Remplace par ton domaine de production
+    origin: ["http://localhost:8081","https://portail-reclamtion-mern-erp.onrender.com"], // Remplace par ton domaine de production
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true, // Permet l'envoi des cookies
 }));

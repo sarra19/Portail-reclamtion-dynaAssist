@@ -277,8 +277,8 @@ async function userVerify(req, res) {
                     WHERE [No_] = @No_
                 `);
 
-            // res.redirect("https://portail-reclamtion-mern-erp.onrender.com/auth/login");
-            res.redirect("http://localhost:3000/auth/login");
+             res.redirect("https://portail-reclamtion-mern-erp.onrender.com/auth/login");
+            // res.redirect("http://localhost:3000/auth/login");
         });
     } catch (error) {
         console.error("Erreur de vérification de l'email :", error);

@@ -2,10 +2,10 @@ const sql = require("mssql");
 require('dotenv').config();
 
 const config = {
-  user: "sarra", // sarra
-  password: "0000", // 0000
-  server: "SARRA\\BCDEMO",//"SARRA\\BCDEMO", 
-  database: "Demo Database BC (24-0)", // Fallback value
+  user: "dynaAssistdb", // sarra
+  password: "201JFT201&too", // 0000
+  server: "dynaassist.database.windows.net",//"SARRA\\BCDEMO", 
+  database: "databasedyna", // Fallback value
   options: {
     encrypt: true,
     trustServerCertificate: true,
