@@ -117,11 +117,10 @@ async function getInterventionsByCurrentUser(req, res) {
 
 async function getInterventionsClient(req, res) {
     try {
-        // Récupérer l'ID de l'utilisateur actuel depuis les paramètres de la requête ou le token d'authentification
-        const currentUserId = req.userId; // Ajustez selon votre méthode d'authentification
+        const currentUserId = req.userId; 
 
         if (!currentUserId) {
-            return res.status(400).send({ message: "User ID is required but not provided." });
+            return res.status(400).send({ message: "L'identifiant utilisateur est requis mais n'est pas fourni." });
         }
 
         const pool = await connectDB();
@@ -130,7 +129,7 @@ async function getInterventionsClient(req, res) {
           SELECT 
                 i.[No_] AS InterventionNo,
                 i.[DatePrevuInterv] AS DatePrevueInterv,
-                r.[Subject] AS SujetReclamation, -- Sujet de la réclamation
+                r.[Subject] AS SujetReclamation, 
                 r.[Sender] AS Beneficiaire, 
                 r.[Receiver] AS Destinataire,
                 r.[Status] AS ReclamationStatus,
@@ -140,20 +139,20 @@ async function getInterventionsClient(req, res) {
             INNER JOIN [Demo Database BC (24-0)].[dbo].[CRONUS International Ltd_$ResponseReclamation$deddd337-e674-44a0-998f-8ddd7c79c8b2] resp
             ON i.[ReponseId] = resp.[No_] -- Jointure sur l'ID de la réponse
             INNER JOIN [Demo Database BC (24-0)].[dbo].[CRONUS International Ltd_$Reclamation$deddd337-e674-44a0-998f-8ddd7c79c8b2] r
-            ON resp.[ReclamationId] = r.[No_] -- Jointure sur l'ID de la réclamation
-            WHERE r.[UserId] = @currentUserId -- Filtrer par l'ID de l'utilisateur actuel
+            ON resp.[ReclamationId] = r.[No_] 
+            WHERE r.[UserId] = @currentUserId 
         `;
 
         const result = await pool.request()
-            .input('currentUserId', currentUserId) // Utiliser des paramètres pour éviter les injections SQL
+            .input('currentUserId', currentUserId) 
             .query(query);
 
         // Transformer les données pour correspondre au format attendu par FullCalendar
         const formattedEvents = result.recordset.map((intervention) => ({
-            id: intervention.InterventionNo, // Identifiant unique de l'intervention
-            title: intervention.SujetReclamation, // Titre de l'événement
-            start: intervention.DatePrevueInterv, // Date de début de l'intervention
-            details: intervention, // Détails supplémentaires pour l'affichage dans la modale
+            id: intervention.InterventionNo, 
+            title: intervention.SujetReclamation, 
+            start: intervention.DatePrevueInterv, 
+            details: intervention, // Détails supplémentaires pour l'affichage 
         }));
 
         res.status(200).send(formattedEvents);
@@ -217,11 +216,10 @@ async function getById(req, res) {
     }
 }
 
-// Backend update function
 async function updateIntervention(req, res) {
     try {
         const pool = await connectDB(); // Connexion à la base de données
-        const { interventionId, datePrevuInterv, technicienResponsable } = req.body; // Récupérer les données depuis la requête
+        const { interventionId, datePrevuInterv, technicienResponsable } = req.body; 
 
         // Vérification si les données nécessaires sont présentes
         if (!interventionId || !datePrevuInterv || !technicienResponsable) {
@@ -248,7 +246,6 @@ async function updateIntervention(req, res) {
             .input('technicienResponsable', technicienResponsable)
             .query(query);
 
-        // Vérification si la mise à jour a réussi
         if (result.rowsAffected > 0) {
             res.status(200).send({
                 success: true,
@@ -273,11 +270,11 @@ async function updateIntervention(req, res) {
 async function deleteIntervention(req, res) {
     try {
         const pool = await connectDB();
-        const { id } = req.params;  // Getting the 'id' from the URL params
+        const { id } = req.params;  
         console.log("id:", id);
 
         await pool.request()
-            .input('No_', id)  // Passing 'id' as a parameter
+            .input('No_', id)  
             .query(`
           DELETE FROM [dbo].[CRONUS International Ltd_$Intervention$deddd337-e674-44a0-998f-8ddd7c79c8b2]
           WHERE [No_] = @No_
@@ -304,7 +301,6 @@ async function findIntervention(req, res) {
         const pool = await connectDB();
         const { beneficiaire, sujet, date, technicienResponsable } = req.query;
 
-        // Start the query with the SELECT clause
         let query = `
             SELECT 
                 i.[No_],
@@ -316,18 +312,17 @@ async function findIntervention(req, res) {
                 i.[$systemCreatedBy],
                 i.[$systemModifiedAt],
                 i.[$systemModifiedBy],
-                r.[Subject] AS SujetReclamation, -- Sujet de la réclamation
-                r.[Sender] AS Beneficiaire -- Bénéficiaire (expéditeur de la réclamation)
+                r.[Subject] AS SujetReclamation,
+                r.[Sender] AS Beneficiaire 
             FROM 
                 [dbo].[CRONUS International Ltd_$Intervention$deddd337-e674-44a0-998f-8ddd7c79c8b2] AS i
             INNER JOIN 
                 [dbo].[CRONUS International Ltd_$Reclamation$deddd337-e674-44a0-998f-8ddd7c79c8b2] AS r
             ON 
-                i.[ReponseId] = r.[No_] -- Jointure sur l'ID de la réponse
+                i.[ReponseId] = r.[No_] 
             WHERE 1=1
         `;
 
-        // Add conditions based on query parameters
         if (beneficiaire) {
             query += ` AND r.[Sender] LIKE @beneficiaire`;
         }
@@ -335,7 +330,7 @@ async function findIntervention(req, res) {
             query += ` AND r.[Subject] LIKE @sujet`;
         }
         if (date) {
-            query += ` AND CONVERT(date, i.[DatePrevuInterv]) = @date`; // Convertir la date pour éviter les problèmes de format
+            query += ` AND CONVERT(date, i.[DatePrevuInterv]) = @date`;
         }
         if (technicienResponsable) {
             query += ` AND i.[TechnicienResponsable] LIKE @technicienResponsable`;
@@ -343,7 +338,6 @@ async function findIntervention(req, res) {
 
         const request = pool.request();
 
-        // Add input parameters to the request
         if (beneficiaire) {
             request.input('beneficiaire', sql.NVarChar, `%${beneficiaire}%`);
         }
@@ -378,7 +372,6 @@ async function sortIntervention(req, res) {
 
         const { sortBy, order } = req.query;
 
-        // Champs valides pour le tri, en tenant compte des alias
         const validSortFields = [
             "DatePrevuInterv",       // i.[DatePrevuInterv]
             "Beneficiaire",          // r.[Sender]
@@ -425,7 +418,6 @@ async function sortIntervention(req, res) {
     LEFT JOIN
         [dbo].[CRONUS International Ltd_$Reclamation$deddd337-e674-44a0-998f-8ddd7c79c8b2] AS r
         ON rr.[ReclamationId] = r.[No_]
-    WHERE r.[Sender] IS NOT NULL AND r.[Subject] IS NOT NULL
     ORDER BY ${orderByColumn} ${order.toUpperCase()}
 `;
 
@@ -471,7 +463,7 @@ async function IntervStats(req, res) {
 
         const result = await pool.request().query(query);
 
-        // Calculer le total des interventions pour le pourcentage
+        // Calculer le total des interventions 
         const totalInterventions = result.recordset.reduce((sum, tech) => sum + tech.NombreInterventions, 0);
 
         // Formater les résultats

@@ -5,7 +5,7 @@ const { sql, connectDB } = require("../config/dbConfig")
 const createChatMessagerie = async (req, res) => {
     const { senderId, receiverId } = req.body;
 
-    console.log("Request body:", req.body); // Vérification des données reçues
+    console.log("Request body:", req.body); 
 
     try {
         const pool = await connectDB();
@@ -25,10 +25,10 @@ const createChatMessagerie = async (req, res) => {
 
         // Si un chat existe déjà, retourner une réponse
         if (checkChatResult.recordset.length > 0) {
-            console.log("Chat already exists:", checkChatResult.recordset[0]);
+            console.log("Le chat existe déjà:", checkChatResult.recordset[0]);
             return res.status(200).json({
                 success: true,
-                message: "Chat already exists",
+                message: "Le chat existe déjà",
                 data: { chatId: checkChatResult.recordset[0].chatId, members: [senderId, receiverId] }
             });
         }
@@ -45,16 +45,16 @@ const createChatMessagerie = async (req, res) => {
             .input('receiverId', sql.NVarChar, receiverId)
             .query(createChatQuery);
 
-        console.log("Chat created successfully:", createChatResult);
+        console.log("Chat créé avec succès :", createChatResult);
 
         res.status(200).json({
             success: true,
-            message: "Chat created successfully",
+            message: "Chat créé avec succès",
             data: { chatId: createChatResult.recordset[0].chatId, members: [senderId, receiverId] }
         });
     } catch (error) {
-        console.error("Error creating chat:", error);
-        res.status(500).json({ success: false, error: "Failed to create chat" });
+        console.error("Erreur lors de la création du chat :", error);
+        res.status(500).json({ success: false, error: "Échec de la création du chat" });
     }
 };
 
@@ -82,14 +82,14 @@ const createChatMessagerie = async (req, res) => {
             data: formattedChats,
             error: false,
             success: true,
-            message: "User chats fetched successfully"
+            message: "Les discussions des utilisateurs ont été récupérées avec succès"
         });
     } catch (error) {
-        console.error("Error fetching user chats:", error);
+        console.error("Erreur lors de la récupération des discussions des utilisateurs :", error);
         res.status(500).json({
             error: true,
             success: false,
-            message: "Failed to fetch user chats"
+            message: "Échec de la récupération des discussions des utilisateurs"
         });
     }
 };
@@ -117,7 +117,7 @@ const createChatMessagerie = async (req, res) => {
   };
  
 const deleteChat = async (req, res) => {
-    const { chatId } = req.params; // Récupérer l'ID du chat à supprimer depuis les paramètres de la requête
+    const { chatId } = req.params; 
 
     try {
         const pool = await connectDB();

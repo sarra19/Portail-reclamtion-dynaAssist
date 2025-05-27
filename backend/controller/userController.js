@@ -38,7 +38,6 @@ async function SignUp(req, res) {
   
       console.log("descriptor1:", descriptor);
   
-      // Validate other fields
       if (!Email || !Password || !FirstName || !LastName || !descriptor) {
         return res.status(400).json({
           message: "All fields, including face registration, are required",
@@ -51,7 +50,6 @@ async function SignUp(req, res) {
       const descriptorString = JSON.stringify(descriptor);
 
   
-      // Connect to the database
       const pool = await connectDB();
   
       // Check if user exists
@@ -155,7 +153,6 @@ async function updateUser(req, res) {
     try {
         const { No_, FirstName, LastName, ProfileImage, City, PostalCode, Biography, Phone, Gender, Country, Address, OccupationUser, CompagnyUser } = req.body;
 
-        // Validate required fields
         if (!No_) {
             return res.status(400).json({
                 message: "L'identifiant de l'utilisateur (No_) est requis.",
@@ -382,7 +379,7 @@ async function SignIn(req, res) {
         message: "Connexion réussie",
         token,
         success: true,
-        userId: user.No_, // Ajoutez cette ligne pour retourner l'ID de l'utilisateur
+        userId: user.No_, 
       });
   
       console.log("🔹 Cookies envoyés:", token); // Debugging
@@ -537,18 +534,18 @@ async function getUser(req, res) {
             });
         }
 
-        const user = result.recordset[0]; // Define the user variable
-        console.log("utilisateur", user); // Log the user details
+        const user = result.recordset[0]; 
+        console.log("utilisateur", user); 
 
         res.status(200).json({
-            data: user, // Send the user details in the response
+            data: user, 
             error: false,
             success: true,
             message: "User details fetched successfully"
         });
 
     } catch (err) {
-        console.error("Error in userDetails:", err); // Log the error for debugging
+        console.error("Error in userDetails:", err); 
         res.status(400).json({
             message: err.message || err,
             error: true,
@@ -577,18 +574,18 @@ async function getVendors(req, res) {
             });
         }
 
-        const user = result.recordset; // Define the user variable
-        console.log("utilisateur", user); // Log the user details
+        const user = result.recordset; 
+        console.log("utilisateur", user); 
 
         res.status(200).json({
-            data: user, // Send the user details in the response
+            data: user, 
             error: false,
             success: true,
             message: "User details fetched successfully"
         });
 
     } catch (err) {
-        console.error("Error in userDetails:", err); // Log the error for debugging
+        console.error("Error in userDetails:", err); 
         res.status(400).json({
             message: err.message || err,
             error: true,
@@ -598,9 +595,9 @@ async function getVendors(req, res) {
 }
 async function getUserByReclamationId(req, res) {
     try {
-        const reclamationId = req.params.id; // Get the reclamation ID from request parameters
+        const reclamationId = req.params.id; 
 
-        const pool = await connectDB(); // Establish DB connection
+        const pool = await connectDB(); 
 
         // Get the reclamation details
         const reclamationResult = await pool.request()
@@ -619,8 +616,8 @@ async function getUserByReclamationId(req, res) {
             });
         }
 
-        const reclamation = reclamationResult.recordset[0]; // Reclamation details
-        const userIdRec = reclamation.UserId; // Get the associated UserId
+        const reclamation = reclamationResult.recordset[0]; 
+        const userIdRec = reclamation.UserId; 
 
         if (!userIdRec) {
             return res.status(400).json({
@@ -648,7 +645,6 @@ async function getUserByReclamationId(req, res) {
         }
 
 
-        // Return both reclamation and user details
         res.status(200).json({ data: userResult.recordset[0] });
 
     } catch (err) {
@@ -726,11 +722,10 @@ async function userDetails(req, res) {
 
 async function getUserDetailsByInterventionId(req, res) {
     try {
-        const interventionId = req.params.id; // Récupérer l'ID de l'intervention depuis les paramètres de la requête
+        const interventionId = req.params.id; 
 
-        const pool = await connectDB(); // Établir la connexion à la base de données
+        const pool = await connectDB();
 
-        // Requête SQL pour récupérer les détails de l'utilisateur
         const query = `
             SELECT 
                 U.[No_] AS UserId,
@@ -764,12 +759,10 @@ async function getUserDetailsByInterventionId(req, res) {
                 I.[No_] = @InterventionId;
         `;
 
-        // Exécuter la requête
         const result = await pool.request()
             .input('InterventionId', sql.Int, interventionId)
             .query(query);
 
-        // Vérifier si des résultats ont été trouvés
         if (result.recordset.length === 0) {
             return res.status(404).json({
                 message: "Aucun utilisateur trouvé pour cette intervention.",
@@ -778,7 +771,6 @@ async function getUserDetailsByInterventionId(req, res) {
             });
         }
 
-        // Retourner les détails de l'utilisateur
         const userDetails = result.recordset[0];
         res.status(200).json({
             data: userDetails,
@@ -798,11 +790,9 @@ async function getUserDetailsByInterventionId(req, res) {
 }
 async function getUserDetailsByRembId(req, res) {
     try {
-        const RembId = req.params.id; // Récupérer l'ID de l'intervention depuis les paramètres de la requête
+        const RembId = req.params.id; 
+        const pool = await connectDB();
 
-        const pool = await connectDB(); // Établir la connexion à la base de données
-
-        // Requête SQL pour récupérer les détails de l'utilisateur
         const query = `
             SELECT 
                 U.[No_] AS UserId,
@@ -836,12 +826,10 @@ async function getUserDetailsByRembId(req, res) {
                 P.[No_] = @RembId;
         `;
 
-        // Exécuter la requête
         const result = await pool.request()
             .input('RembId', sql.Int, RembId)
             .query(query);
 
-        // Vérifier si des résultats ont été trouvés
         if (result.recordset.length === 0) {
             return res.status(404).json({
                 message: "Aucun utilisateur trouvé pour cette remboursement.",
@@ -850,7 +838,6 @@ async function getUserDetailsByRembId(req, res) {
             });
         }
 
-        // Retourner les détails de l'utilisateur
         const userDetails = result.recordset[0];
         res.status(200).json({
             data: userDetails,
@@ -995,9 +982,8 @@ async function findUsers(req, res) {
   async function sortUsers(req, res) {
     try {
         const pool = await connectDB();
-        const { sortBy, order } = req.query; // `sortBy` peut être 'FirstName', 'LastName', ou 'Email'. `order` peut être 'ASC' ou 'DESC'.
+        const { sortBy, order } = req.query; 
 
-        // Validation des paramètres de tri
         const validSortFields = ['FirstName', 'LastName', 'Email'];
         const validOrders = ['ASC', 'DESC'];
 
@@ -1009,7 +995,6 @@ async function findUsers(req, res) {
             });
         }
 
-        // Requête SQL pour trier les utilisateurs
         const query = `
             SELECT *
             FROM [dbo].[CRONUS International Ltd_$User_Details$deddd337-e674-44a0-998f-8ddd7c79c8b2]

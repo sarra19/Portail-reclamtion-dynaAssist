@@ -412,6 +412,7 @@ export default function Produits() {
                 </ul>
               </nav>
             </motion.div>
+            
           </div>
         </section>
       </main>

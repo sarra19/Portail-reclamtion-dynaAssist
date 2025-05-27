@@ -305,10 +305,7 @@ const SummaryApi = {
         url: `${backendDomin}/updateCommentaire`,
         method: 'put'
     },
-    startAudioCall: {
-        url: `${backendDomin}/startAudioCall`,
-        method: 'post'
-    },
+ 
     verifyFace: {
         url: `${backendDomin}/verifyFace`,
         method: 'post'
@@ -325,10 +322,7 @@ const SummaryApi = {
         url: `${backendDomin}/speechToText`,
         method: 'post'
     },
-    generateZegoToken: {
-        url: `${backendDomin}/generate-zego-token`,
-        method: 'post'
-    },
+  
     rembStats: {
         url: `${backendDomin}/rembStats`,
         method: 'get'

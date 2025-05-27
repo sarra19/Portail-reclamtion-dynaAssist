@@ -2,7 +2,6 @@ const { sql, connectDB } = require("../config/dbConfig")
 
 async function add(req, res) {
     try {
-        console.log('data', req.body.name);
         const { UserId, Activity } = req.body;
         console.log('UserId:', UserId);
         console.log('Activity:', Activity);
@@ -56,21 +55,11 @@ async function getall(req, res) {
     }
 }
 
-async function updateHistorique(req, res) {
-    try {
-        await historiqueModel.findByIdAndUpdate(
-            req.params.id,
-            req.body);
-        res.status(200).send("data updated")
 
-    } catch (err) {
-        res.status(400).json(err);
-    }
-}
-async function getbyid(req, res) {
+async function getbyid(req, res) { //get user details by historique id
     try {
-        const pool = await connectDB(); 
-        const Historiqueid = req.params.id; 
+        const pool = await connectDB();
+        const Historiqueid = req.params.id;
 
         const query = `
             SELECT 
@@ -101,14 +90,13 @@ async function getbyid(req, res) {
         `;
 
         const result = await pool.request()
-            .input('Historiqueid', Historiqueid) 
+            .input('Historiqueid', Historiqueid)
             .query(query);
 
-        // Vérifier si une intervention a été trouvée
         if (result.recordset.length > 0) {
-            res.status(200).send(result.recordset[0]); 
+            res.status(200).send(result.recordset[0]);
         } else {
-            res.status(404).send({ message: "historique non trouvée" }); 
+            res.status(404).send({ message: "historique non trouvée" });
         }
     } catch (err) {
         console.error("Erreur lors de la récupération de historique:", err);
@@ -171,7 +159,7 @@ async function findHistory(req, res) {
         const pool = await connectDB();
         const { Activity, ActivityDate, FirstName, LastName } = req.query;
 
-        console.log("Paramètres de recherche:", { Activity, ActivityDate, FirstName, LastName }); // Log des paramètres
+        console.log("Paramètres de recherche:", { Activity, ActivityDate, FirstName, LastName }); 
 
         let query = `
             SELECT 
@@ -189,7 +177,8 @@ async function findHistory(req, res) {
                 h.[UserId] = U.[No_]
             WHERE 1=1
         `;
-
+//where 1=1 is used to simplify the addition of conditions
+        // Ajout des conditions de recherche dynamiquement
         if (Activity) {
             query += ` AND h.[Activity] LIKE @Activity`;
         }
@@ -203,7 +192,7 @@ async function findHistory(req, res) {
             query += ` AND U.[LastName] LIKE @LastName`;
         }
 
-        console.log("Requête SQL générée:", query); // Log de la requête SQL
+     
 
         const request = pool.request();
 
@@ -237,12 +226,10 @@ async function sortHistory(req, res) {
     try {
         const pool = await connectDB();
 
-        // Récupérer les paramètres de tri de la requête
         const { sortBy, order } = req.query;
 
-        // Validation des paramètres de tri
         const validSortFields = ["ActivityDate", "FirstName", "LastName", "Activity"]; // Champs valides pour le tri
-        const validOrders = ["ASC", "DESC"]; // Ordres valides
+        const validOrders = ["ASC", "DESC"]; 
 
         if (!validSortFields.includes(sortBy) || !validOrders.includes(order)) {
             return res.status(400).json({
@@ -252,7 +239,6 @@ async function sortHistory(req, res) {
             });
         }
 
-        // Construire la requête SQL avec le tri
         const query = `
             SELECT 
                 h.[No_], 
@@ -290,4 +276,4 @@ async function sortHistory(req, res) {
     }
 }
 
-module.exports = { add,sortHistory,deleteAllHistorique,findHistory, getall, getbyid, updateHistorique, deleteHistorique }
+module.exports = { add, sortHistory, deleteAllHistorique, findHistory, getall, getbyid, deleteHistorique }

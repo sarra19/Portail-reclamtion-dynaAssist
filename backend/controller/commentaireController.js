@@ -13,8 +13,8 @@ async function add(req, res) {
             return res.status(400).json({ message: "Saisir votre Commentaire ou ajouter un fichier." });
         }
 
-        console.log("🔹 ServiceId reçu:", ServiceId); // ➜ Affiche la valeur dans la console
-        console.log("🔹 ProductId reçu:", ProductId); // ➜ Vérification du ProductId aussi
+        console.log("🔹 ServiceId reçu:", ServiceId);
+        console.log("🔹 ProductId reçu:", ProductId);
 
         const pool = await connectDB();
 
@@ -198,10 +198,10 @@ async function getall(req, res) {
 }
 async function updateCommentaire(req, res) {
     try {
-        const userId = req.userId; // Id de l'utilisateur connecté
+        const userId = req.userId; 
                 console.log("userId :", userId)
 
-        const commentId = req.params.id; // ID du commentaire à modifier
+        const commentId = req.params.id; 
         const { Content, AttachedFile, Status } = req.body; // Champs modifiables
 
         if (!userId) {
@@ -290,15 +290,13 @@ async function getbyid(req, res) {
 async function deleteComment(req, res) {
     try {
         const pool = await connectDB();
-        const userId = req.userId;
 
         const comment = await pool.request()
             .input('No_', sql.NVarChar, req.params.id)
-            .input('UserId', sql.NVarChar, userId)
             .query(`
               Delete FROM 
                 [dbo].[CRONUS International Ltd_$Comment$deddd337-e674-44a0-998f-8ddd7c79c8b2] 
-                WHERE [No_] = @No_ AND [UserId] = @UserId
+                WHERE [No_] = @No_
             `);
 
         res.status(200).json({ data: comment.recordset[0] });
@@ -310,7 +308,6 @@ async function deleteComment(req, res) {
 async function getCommentsByService(req, res) {
     try {
         const serviceId = req.params.id;
-        console.log("service :", serviceId)
         console.log("service :", req.params.id)
         if (!serviceId) {
             return res.status(400).json({ success: false, message: "Service ID is required" });

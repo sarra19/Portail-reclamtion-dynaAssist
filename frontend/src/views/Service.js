@@ -16,7 +16,10 @@ export default function Service() {
   const user = useSelector(state => state?.user?.user);
   const [currentPage, setCurrentPage] = useState(1);
   const [servicePerPage] = useState(4); // Number of services per page
-
+  const pageNumbers = [];
+  for (let i = 1; i <= Math.ceil(filteredServices.length / servicePerPage); i++) {
+    pageNumbers.push(i);
+  }
   // Variants pour les animations
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -267,11 +270,54 @@ export default function Service() {
                     id={service.No_}
                   />
                 </motion.div>
+                
               ))
             ) : (
               <p className="text-center w-full">Aucun service trouvé.</p>
             )}
           </motion.div>
+            {/* Pagination animée */}
+                      <motion.div
+                        className="py-2 flex justify-center"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.6, delay: 0.5 }}
+                      >
+                        <nav className="block">
+                          <ul className="flex pl-0 rounded list-none flex-wrap">
+                            <li>
+                              <a
+                                href="#pablo"
+                                onClick={() => setCurrentPage(currentPage > 1 ? currentPage - 1 : 1)}
+                                className="first:ml-0 text-xs font-semibold flex w-8 h-8 mx-1 p-0 rounded-full items-center justify-center leading-tight relative border border-solid border-orange-dys bg-white text-orange-dys"
+                              >
+                                <i className="fas fa-chevron-left -ml-px"></i>
+                              </a>
+                            </li>
+                            {pageNumbers.map(number => (
+                              <li key={number}>
+                                <a
+                                  href="#pablo"
+                                  onClick={() => setCurrentPage(number)}
+                                  className={`first:ml-0 text-xs font-semibold ml-1 flex w-8 h-8 mx-1 p-0 rounded-full items-center justify-center leading-tight relative ${currentPage === number ? "bg-orange-dys text-white" : "bg-white text-orange-dys"
+                                    } border border-solid border-orange-dys`}
+                                >
+                                  {number}
+                                </a>
+                              </li>
+                            ))}
+                            <li>
+                              <a
+                                href="#pablo"
+                                onClick={() => setCurrentPage(currentPage < pageNumbers.length ? currentPage + 1 : pageNumbers.length)}
+                                className="text-xs font-semibold ml-1 flex w-8 h-8 mx-1 p-0 rounded-full items-center justify-center leading-tight relative border border-solid border-orange-dys bg-white text-orange-dys"
+                              >
+                                <i className="fas fa-chevron-right -ml-px"></i>
+                              </a>
+                            </li>
+                          </ul>
+                        </nav>
+                      </motion.div>
         </section>
       </main>
       <Footer />

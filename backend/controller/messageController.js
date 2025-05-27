@@ -54,7 +54,7 @@ const getMessages = async (req, res) => {
 };
 
 const deleteMessage = async (req, res) => {
-    const { messageId } = req.params; // Supposons que l'ID du message est passé en tant que paramètre d'URL
+    const { messageId } = req.params; 
 
     try {
         const pool = await connectDB();

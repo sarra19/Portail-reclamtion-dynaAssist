@@ -142,7 +142,7 @@ async function add(req, res) {
             .input("NameTarget", sql.NVarChar, Name)
             .input("StatusRec", sql.NVarChar, "Résolu")
             .input("Urgent", sql.Bit, 1)
-            .input("Reading", sql.Bit, 0)
+            .input("Reading", sql.Bit,1)
             .input("ReclamationId", sql.Int, ReclamationId)
             .input("Receiver", sql.NVarChar, UserId)
             .query(notificationQuery);
@@ -184,15 +184,14 @@ async function add(req, res) {
 
 async function getResponsesByReclamation(req, res) {
     try {
-        const { reclamationId } = req.params; // Récupérer l'ID de la réclamation depuis les paramètres de la requête
+        const { reclamationId } = req.params;
 
         if (!reclamationId) {
             return res.status(400).json({ message: "L'ID de la réclamation est requis." });
         }
 
-        const pool = await connectDB(); // Connexion à la base de données
+        const pool = await connectDB();
 
-        // Requête pour récupérer la réponse associée à la réclamation
         const query = `
             SELECT 
                 rr.No_ AS ResponseId,
@@ -241,8 +240,8 @@ async function getResponsesByReclamation(req, res) {
             serviceSup: row.ServiceSup,
             reclamationId: row.ReclamationId,
             createdAt: row.CreatedAt,
-            remboursement: null, // Initialiser à null
-            intervention: null, // Initialiser à null
+            remboursement: null, 
+            intervention: null, 
         };
 
         // Ajouter les détails de remboursement si ServiceSup est 1 ou 3
@@ -325,12 +324,11 @@ async function updateReponse(req, res) {
             DatePrevuInterv,
         } = req.body;
 
-        // Validation des champs obligatoires
         if (!responseId || !content) {
             return res.status(400).json({ message: "Tous les champs obligatoires doivent être remplis." });
         }
 
-        const pool = await connectDB(); // Connexion à la base de données
+        const pool = await connectDB();
         transaction = new sql.Transaction(pool);
         await transaction.begin();
 
@@ -500,26 +498,17 @@ async function updateReponse(req, res) {
         });
     }
 }
-async function getbyid(req, res) {
-    try {
-        const data = await réponseModel.findById(req.params.id);
 
-        res.status(200).send(data)
-    } catch (err) {
-        res.status(400).send(err);
-    }
-}
 async function deleteRéponse(req, res) {
     let transaction;
     try {
-        const userId = req.userId; // Récupérer l'ID de l'utilisateur connecté
+        const userId = req.userId; 
         if (!userId) {
             return res.status(401).json({ message: "Utilisateur non authentifié" });
         }
 
-        const { responseId } = req.body; // Récupérer l'ID de la réponse à supprimer
+        const { responseId } = req.body; 
 
-        // Validation des champs obligatoires
         if (!responseId) {
             return res.status(400).json({ message: "L'ID de la réponse est obligatoire." });
         }
@@ -598,4 +587,4 @@ async function deleteRéponse(req, res) {
 
 
 
-module.exports = { add, getall, getbyid,getResponsesByReclamation, updateReponse, deleteRéponse , suggestions}
+module.exports = { add, getall,getResponsesByReclamation, updateReponse, deleteRéponse , suggestions}

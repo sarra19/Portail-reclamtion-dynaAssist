@@ -145,7 +145,7 @@ async function updateRemboursement(req, res) {
         const result = await pool.request()
             .input('RembId', sql.Int, RembId)
             .input('datePrevu', sql.Date, datePrevu)
-            .input('Montant', sql.Decimal, Montant) // Assurez-vous que le type correspond à votre base de données
+            .input('Montant', sql.Decimal, Montant) 
             .query(query);
 
         // Vérification si la mise à jour a réussi
@@ -229,11 +229,11 @@ async function getById(req, res) {
 async function deleteRemboursement(req, res) {
     try {
         const pool = await connectDB();
-        const { id } = req.params;  // Getting the 'id' from the URL params
+        const { id } = req.params;  
         console.log("id:", id);
 
         await pool.request()
-            .input('No_', id)  // Passing 'id' as a parameter
+            .input('No_', id)  
             .query(`
           DELETE FROM [dbo].[CRONUS International Ltd_$Payback$deddd337-e674-44a0-998f-8ddd7c79c8b2]
           WHERE [No_] = @No_
@@ -377,7 +377,7 @@ async function sortRemboursements(req, res) {
 
 
 
-async function rembStats(req, res) {
+async function rembStats(req, res) { // Fonction pour récupérer les statistiques des remboursements par mois et année
     try {
         const pool = await connectDB();
 
@@ -401,7 +401,6 @@ async function rembStats(req, res) {
 
         const result = await pool.request().query(query);
 
-        // Formater les résultats pour une meilleure lisibilité
         const stats = result.recordset.map(item => ({
             annee: item.Annee,
             mois: item.Mois,

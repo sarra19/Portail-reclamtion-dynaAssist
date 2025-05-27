@@ -71,7 +71,6 @@ async function updateService(req, res) {
             WHERE [No_] = @No_;
         `;
 
-    // Exécuter la requête SQL
     const result = await pool.request()
       .input('Name', sql.NVarChar, Name)
       .input('Description', sql.NVarChar, Description || '')
@@ -80,7 +79,6 @@ async function updateService(req, res) {
       .input('No_', sql.NVarChar, id)
       .query(updateQuery);
 
-    // Vérifier si la mise à jour a réussi
     if (result.rowsAffected[0] === 0) {
       return res.status(400).json({ success: false, error: "La mise à jour a échoué. Aucune ligne affectée." });
     }
@@ -152,7 +150,6 @@ async function searchServices(req, res) {
     const pool = await connectDB();
     const { Name, Tags } = req.query;
 
-    // Construction de la requête SQL de base
     let query = `
         SELECT 
       *
@@ -160,7 +157,6 @@ async function searchServices(req, res) {
         WHERE 1=1
     `;
 
-    // Ajout des filtres en fonction des paramètres fournis
     if (Name) {
       query += ` AND [Name] LIKE @Name`;
     }
@@ -199,12 +195,10 @@ async function sortServices(req, res) {
   try {
     const pool = await connectDB();
 
-    // Récupérer les paramètres de tri de la requête
     const { sortBy, order } = req.query;
 
-    // Validation des paramètres de tri
-    const validSortFields = ["Name", "Tags"]; // Champs valides pour le tri
-    const validOrders = ["ASC", "DESC"]; // Ordres valides
+    const validSortFields = ["Name", "Tags"]; 
+    const validOrders = ["ASC", "DESC"]; 
 
     if (!validSortFields.includes(sortBy) || !validOrders.includes(order)) {
       return res.status(400).json({
@@ -214,7 +208,6 @@ async function sortServices(req, res) {
       });
     }
 
-    // Construire la requête SQL avec le tri
     const query = `
       SELECT 
         *
@@ -222,10 +215,8 @@ async function sortServices(req, res) {
       ORDER BY ${sortBy} ${order}
     `;
 
-    // Exécuter la requête
     const result = await pool.request().query(query);
 
-    // Renvoyer les résultats triés
     res.status(200).json({
       success: true,
       error: false,

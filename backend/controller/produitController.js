@@ -99,12 +99,10 @@ async function updateProduit(req, res) {
         const { Name, Description, Price, Vendor, Tags, ImageProduct } = req.body;
         const { id } = req.params;
     
-        // Validation des champs obligatoires
         if (!Name || !Price || !Vendor) {
           return res.status(400).json({ success: false, error: "Les champs Name, Price et Vendor sont obligatoires." });
         }
     
-        // Requête SQL pour mettre à jour le produit
         const updateQuery = `
           UPDATE [dbo].[CRONUS International Ltd_$Product$deddd337-e674-44a0-998f-8ddd7c79c8b2] 
           SET 
@@ -117,7 +115,6 @@ async function updateProduit(req, res) {
           WHERE [No_] = @No_;
         `;
     
-        // Exécuter la requête SQL
         const result = await pool.request()
           .input('Name', sql.NVarChar, Name)
           .input('Description', sql.NVarChar, Description || '')
@@ -133,7 +130,6 @@ async function updateProduit(req, res) {
           return res.status(400).json({ success: false, error: "La mise à jour a échoué. Aucune ligne affectée." });
         }
     
-        // Réponse en cas de succès
         res.status(200).json({ success: true, message: "Produit mis à jour avec succès." });
     
       } catch (err) {
@@ -177,7 +173,6 @@ async function searchProducts(req, res) {
         const pool = await connectDB();
         const { Name, PriceMin, PriceMax } = req.query;
 
-        // Construction de la requête SQL de base
         let query = `
             SELECT 
                 [timestamp], [No_], [Name], [Description], [Price], [ImageProduct], [Vendor]
@@ -228,12 +223,10 @@ async function sortProducts(req, res) {
     try {
         const pool = await connectDB();
 
-        // Récupérer les paramètres de tri de la requête
         const { sortBy, order } = req.query;
 
-        // Validation des paramètres de tri
-        const validSortFields = ["Name", "Price", "Vendor"]; // Champs valides pour le tri
-        const validOrders = ["ASC", "DESC"]; // Ordres valides
+        const validSortFields = ["Name", "Price", "Vendor"]; 
+        const validOrders = ["ASC", "DESC"];
 
         if (!validSortFields.includes(sortBy) || !validOrders.includes(order)) {
             return res.status(400).json({
@@ -243,7 +236,6 @@ async function sortProducts(req, res) {
             });
         }
 
-        // Construire la requête SQL avec le tri
         const query = `
             SELECT 
                 [timestamp], [No_], [Name], [Description], [Price], [ImageProduct], [Vendor]
@@ -251,10 +243,8 @@ async function sortProducts(req, res) {
             ORDER BY ${sortBy} ${order}
         `;
 
-        // Exécuter la requête
         const result = await pool.request().query(query);
 
-        // Renvoyer les résultats triés
         res.status(200).json({
             success: true,
             error: false,
@@ -272,7 +262,7 @@ async function sortProducts(req, res) {
     }
 }
 
-async function productsByVendorStats(req, res) {
+async function productsByVendorStats(req, res) { // Fonction pour récupérer les statistiques des produits par fournisseur
     try {
         const pool = await connectDB();
 

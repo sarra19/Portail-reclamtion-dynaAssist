@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const serviceController=require("../controller/serviceController");
 const produitController=require("../controller/produitController");
-const appelController=require("../controller/appelController");
 const chatController=require("../controller/chatController");
 const commentaireController=require("../controller/commentaireController");
 const historiqueController=require("../controller/historiqueController");
@@ -58,12 +57,7 @@ router.get('/productsByVendorStats',produitController.productsByVendorStats)
 
 
 
-//appel
-// router.post("/addAppel",appelController.add)
-// router.get("/getAllAppel",appelController.getall)
-// router.get("/getAppel/:id",appelController.getbyid)
-// router.put('/updateAppel/:id',appelController.updateAppel);
-// router.delete('/deleteAppel/:id',appelController.deleteAppel);
+
 
 //chat
 
@@ -93,7 +87,6 @@ router.get("/getLikeStatusService",likeController.getLikeStatusService)
 router.post("/addHistorique",historiqueController.add)
 router.get("/getAllHistory",historiqueController.getall)
 router.get("/getHistorique/:id",historiqueController.getbyid)
-router.put('/updateHistorique/:id',historiqueController.updateHistorique);
 router.delete('/deleteHistorique',historiqueController.deleteHistorique);
 router.delete('/deleteAllHistorique',historiqueController.deleteAllHistorique);
 router.get("/findHistory",historiqueController.findHistory)
@@ -125,7 +118,6 @@ router.get('/getuserChats/:userId', chatController.userChats);
 router.get('/find/:firstId/:secondId', chatController.findChat);
 router.delete('/deleteChat/:chatId', chatController.deleteChat);
 //notification
-router.post("/addNotification",notificationController.add)
 router.get("/getNotifications",notificationController.getNotifications)
 router.delete('/deleteNotification/:NotificationId', notificationController.deleteNotification);
 
@@ -162,7 +154,6 @@ router.get("/rembStats",remboursementController.rembStats)
 router.post("/addReponse",authToken,validateResponse,réponseController.add)
 router.get("/getAllReponse",réponseController.getall)
 router.get("/getResponsesByReclamation/:reclamationId",réponseController.getResponsesByReclamation)
-router.get("/getReponse/:id",réponseController.getbyid)
 router.put('/updateReponse',authToken,réponseController.updateReponse);
 router.delete('/deleteReponse',authToken,réponseController.deleteRéponse);
 

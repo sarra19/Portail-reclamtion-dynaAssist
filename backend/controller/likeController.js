@@ -21,14 +21,14 @@ async function getall(req, res) {
         res.status(400).send(err);
     }
 }
-async function add(req, res) {
+async function add(req, res) { //ajout like produit
     try {
-      const { ProductID, UserID,ServiceID } = req.body;
+      const { ProductID, UserID } = req.body;
   
       if (!ProductID || !UserID) {
         return res.status(400).json({
           success: false,
-          message: "ProductID and UserID are required.",
+          message: "ProductID et UserID sont obligatoires.",
         });
       }
   
@@ -43,7 +43,7 @@ async function add(req, res) {
         .input('UserID', sql.NVarChar, UserID)
         .input('ProductID', sql.NVarChar, ProductID)
         .query(checkQuery);
-  
+  //si déja like on supprime sinon on ajoute
       if (checkResult.recordset.length > 0) {
         const deleteQuery = `
           DELETE FROM [dbo].[CRONUS International Ltd_$Like$deddd337-e674-44a0-998f-8ddd7c79c8b2]
@@ -125,7 +125,7 @@ async function add(req, res) {
 
   async function addLikeService(req, res) {
     try {
-      const { ServiceID, UserID,ProductID } = req.body;
+      const { ServiceID, UserID } = req.body;
   
       if (!ServiceID || !UserID) {
         return res.status(400).json({

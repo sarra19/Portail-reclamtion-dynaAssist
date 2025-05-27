@@ -17,11 +17,10 @@ async function insertReclamationAndNotify(pool, transaction, {
     Sender
 }) {
     try {
-        // Insert Reclamation
         const reclamationQuery = `
             INSERT INTO [dbo].[CRONUS International Ltd_$Reclamation$deddd337-e674-44a0-998f-8ddd7c79c8b2]
             ([TargetType], [Name], [Subject], [ComplaintType], [AttachedFile], [Content], [VoiceNote], [UserId], [Status], [ServiceId], [ProductId], [CreatedAt], [Receiver], [Sender])
-            OUTPUT INSERTED.No_
+            OUTPUT INSERTED.No_ -- Retourne l'ID de la réclamation insérée sans reclamationId
             VALUES 
             (@TargetType, @Name, @Subject, @ComplaintType, @AttachedFile, @Content, @VoiceNote, @UserId, @Status, @ServiceId, @ProductId, GETDATE(), @Receiver, @Sender)
         `;
@@ -44,7 +43,6 @@ async function insertReclamationAndNotify(pool, transaction, {
 
         const reclamationId = reclamationResult.recordset[0].No_;
 
-        // Insert Notification
         const notificationQuery = `
             INSERT INTO [dbo].[CRONUS International Ltd_$Notification$deddd337-e674-44a0-998f-8ddd7c79c8b2] 
             ([TargetTypeRec], [NameTarget], [StatusRec], [Urgent], [Reading], [ReclamationId], [Receiver], [CreatedAt])
@@ -83,9 +81,8 @@ async function insertReclamationAndNotify(pool, transaction, {
         throw err;
     }
 }
-// Function to add a reclamation directed to a vendor
 async function addRectoVendor(req, res) {
-    let transaction;
+    let transaction; // les 3 étapes sql doient toutes réussies, sinon, tu veux annuler tout
     try {
         const userId = req.userId;
         if (!userId) {
@@ -175,9 +172,8 @@ async function addRectoVendor(req, res) {
     }
 }
 
-// Function to add a reclamation directed to an admin
 async function addRecToAdmin(req, res) {
-    let transaction;
+    let transaction;  // les 3 étapes sql doient toutes réussies, sinon, tu veux annuler tout
     try {
         const userId = req.userId;
         if (!userId) {
@@ -347,7 +343,6 @@ async function updateStatus(req, res) {
             });
         }
 
-        // Réponse HTTP
         return res.status(200).json({
             success: true,
             message: "Statut mis à jour avec succès.",
@@ -368,7 +363,6 @@ async function ArchiveRec(req, res) {
     try {
         const pool = await connectDB();
 
-        // 1. Vérifier si l'ID de la réclamation est fourni
         if (!req.params.id) {
             return res.status(400).json({
                 success: false,
@@ -377,7 +371,6 @@ async function ArchiveRec(req, res) {
             });
         }
 
-        // 2. Mettre à jour le statut de la réclamation à 1
         const updateResult = await pool.request()
             .input('No_', sql.NVarChar, req.params.id)
             .query(`
@@ -386,7 +379,6 @@ async function ArchiveRec(req, res) {
                 WHERE [No_] = @No_
             `);
 
-        // 3. Vérifier si la réclamation a été mise à jour
         if (updateResult.rowsAffected[0] === 0) {
             return res.status(404).json({
                 success: false,
@@ -395,7 +387,6 @@ async function ArchiveRec(req, res) {
             });
         }
 
-        // 4. Renvoyer une réponse de succès
         res.status(200).json({
             success: true,
             error: false,
@@ -403,7 +394,6 @@ async function ArchiveRec(req, res) {
         });
 
     } catch (err) {
-        // Gestion des erreurs
         res.status(500).json({
             success: false,
             error: true,
@@ -416,7 +406,6 @@ async function desArchiveRec(req, res) {
     try {
         const pool = await connectDB();
 
-        // 1. Vérifier si l'ID de la réclamation est fourni
         if (!req.params.id) {
             return res.status(400).json({
                 success: false,
@@ -425,7 +414,6 @@ async function desArchiveRec(req, res) {
             });
         }
 
-        // 2. Mettre à jour le statut de la réclamation à 1
         const updateResult = await pool.request()
             .input('No_', sql.NVarChar, req.params.id)
             .query(`
@@ -434,7 +422,6 @@ async function desArchiveRec(req, res) {
                 WHERE [No_] = @No_
             `);
 
-        // 3. Vérifier si la réclamation a été mise à jour
         if (updateResult.rowsAffected[0] === 0) {
             return res.status(404).json({
                 success: false,
@@ -443,7 +430,6 @@ async function desArchiveRec(req, res) {
             });
         }
 
-        // 4. Renvoyer une réponse de succès
         res.status(200).json({
             success: true,
             error: false,
@@ -451,7 +437,6 @@ async function desArchiveRec(req, res) {
         });
 
     } catch (err) {
-        // Gestion des erreurs
         res.status(500).json({
             success: false,
             error: true,
@@ -477,7 +462,7 @@ async function getall(req, res) {
 
 async function getbyid(req, res) {
     try {
-        const { id } = req.params; // Extract the ID from the request parameters
+        const { id } = req.params; 
         if (!id) {
             return res.status(400).json({
                 success: false,
@@ -486,7 +471,7 @@ async function getbyid(req, res) {
             });
         }
 
-        const pool = await connectDB(); // Connect to the database
+        const pool = await connectDB(); 
         const reclamationQuery = `
             SELECT *
             FROM [dbo].[CRONUS International Ltd_$Reclamation$deddd337-e674-44a0-998f-8ddd7c79c8b2]
@@ -494,7 +479,7 @@ async function getbyid(req, res) {
         `;
 
         const result = await pool.request()
-            .input('No_', sql.NVarChar, id) // Use the ID as a parameter
+            .input('No_', sql.NVarChar, id) 
             .query(reclamationQuery);
 
         if (result.recordset.length === 0) {
@@ -505,7 +490,6 @@ async function getbyid(req, res) {
             });
         }
 
-        // Return the retrieved réclamation data
         res.status(200).json({
             success: true,
             error: false,
@@ -524,17 +508,14 @@ async function getbyid(req, res) {
 }
 
 
-async function RecievedRec(req, res) {
+async function RecievedRec(req, res) { // Récupérer les réclamations reçues par l'utilisateur avec sort
     try {
-        // Récupération de l'ID utilisateur
         console.log("userId", req.userId);
 
         const pool = await connectDB();
 
-        // Récupérer les paramètres de tri de la requête
         const { sortBy, order } = req.query;
 
-        // Validation des paramètres de tri
         const validSortFields = ["CreatedAt", "Subject", "Name"];
         const validOrders = ["ASC", "DESC"];
 
@@ -546,7 +527,6 @@ async function RecievedRec(req, res) {
             });
         }
 
-        // Requête pour récupérer les réclamations où le Receiver est égal à l'userId avec tri
         const result = await pool.request()
             .input('userId', req.userId)
             .query(`
@@ -555,7 +535,6 @@ async function RecievedRec(req, res) {
                 ORDER BY ${sortBy} ${order}
             `);
 
-        // Vérification si des réclamations ont été trouvées
         if (result.recordset.length === 0) {
             return res.status(404).json({
                 message: "Aucune réclamation trouvée pour cet utilisateur",
@@ -564,7 +543,6 @@ async function RecievedRec(req, res) {
             });
         }
 
-        // Renvoi des réclamations trouvées
         res.status(200).json({
             success: true,
             data: result.recordset,
@@ -580,7 +558,7 @@ async function RecievedRec(req, res) {
         });
     }
 }
-async function mesReclamations(req, res) {
+async function mesReclamations(req, res) {   //récuperer mes réclamations avec sort
     try {
         console.log("userId", req.userId);
 
@@ -588,7 +566,6 @@ async function mesReclamations(req, res) {
 
         const { sortBy, order } = req.query;
 
-        // Validation des paramètres de tri
         const validSortFields = ["CreatedAt", "Subject", "Name"];
         const validOrders = ["ASC", "DESC"];
 
@@ -600,7 +577,6 @@ async function mesReclamations(req, res) {
             });
         }
 
-        // Requête pour récupérer les réclamations où le Sender est égal à l'userId avec tri
         const result = await pool.request()
             .input('userId', req.userId)
             .query(`
@@ -609,7 +585,6 @@ async function mesReclamations(req, res) {
                 ORDER BY ${sortBy} ${order}
             `);
 
-        // Vérification si des réclamations ont été trouvées
         if (result.recordset.length === 0) {
             return res.status(404).json({
                 message: "Aucune réclamation envoyée trouvée pour cet utilisateur",
@@ -618,7 +593,6 @@ async function mesReclamations(req, res) {
             });
         }
 
-        // Renvoi des réclamations trouvées
         res.status(200).json({
             success: true,
             data: result.recordset,
@@ -746,16 +720,14 @@ async function findReclamation(req, res) {
     }
 }
 
-async function sortReclamation(req, res) {
+async function sortReclamation(req, res) { //admintable
     try {
         const pool = await connectDB();
 
-        // Récupérer les paramètres de tri de la requête
         const { sortBy, order } = req.query;
 
-        // Validation des paramètres de tri
-        const validSortFields = ["CreatedAt", "Subject", "Name"]; // Champs valides pour le tri
-        const validOrders = ["ASC", "DESC"]; // Ordres valides
+        const validSortFields = ["CreatedAt", "Subject", "Name"]; 
+        const validOrders = ["ASC", "DESC"]; 
 
         if (!validSortFields.includes(sortBy) || !validOrders.includes(order)) {
             return res.status(400).json({
@@ -765,17 +737,14 @@ async function sortReclamation(req, res) {
             });
         }
 
-        // Construire la requête SQL avec le tri
         const query = `
             SELECT *
             FROM [dbo].[CRONUS International Ltd_$Reclamation$deddd337-e674-44a0-998f-8ddd7c79c8b2]
             ORDER BY ${sortBy} ${order}
         `;
 
-        // Exécuter la requête
         const result = await pool.request().query(query);
 
-        // Renvoyer les résultats triés
         res.status(200).json({
             success: true,
             error: false,
@@ -793,11 +762,10 @@ async function sortReclamation(req, res) {
     }
 }
 
-async function reclamationStats(req, res) {
+async function reclamationStats(req, res) { // Récupérer les statistiques de réclamations par mois et année
     try {
         const pool = await connectDB();
 
-        // Requête pour obtenir le nombre de réclamations par mois et par année
         const query = `
             SELECT 
                 YEAR(CreatedAt) AS year,
@@ -810,7 +778,6 @@ async function reclamationStats(req, res) {
 
         const result = await pool.request().query(query);
 
-        // Formater les résultats pour l'API
         const stats = result.recordset.map(item => ({
             year: item.year,
             month: item.month,
@@ -834,8 +801,7 @@ async function reclamationStats(req, res) {
 }
 
 
-// Option 2: Utilisation d'un service tiers comme AssemblyAI
-async function transcribeWithAssemblyAI(audioBlob) {
+async function transcribeWithAssemblyAI(audioBlob) { // Fonction pour transcrire l'audio avec AssemblyAI
     try {
         // Envoyer l'audio à AssemblyAI
         const uploadResponse = await axios.post(
@@ -884,7 +850,7 @@ async function transcribeWithAssemblyAI(audioBlob) {
                 transcriptionResult = statusResponse.data.text;
                 break;
             } else if (statusResponse.data.status === 'error') {
-                throw new Error('Transcription failed');
+                throw new Error('Échec de la transcription');
             }
 
             // Attendre avant de vérifier à nouveau
@@ -893,13 +859,12 @@ async function transcribeWithAssemblyAI(audioBlob) {
 
         return transcriptionResult;
     } catch (error) {
-        console.error('AssemblyAI error:', error);
+        console.error('Échec de la transcription:', error);
         throw error;
     }
 }
 
-// Endpoint principal
-async function speechToText(req, res) {
+async function speechToText(req, res) { // Fonction pour convertir la parole en texte main function
     try {
         if (!req.file) {
             return res.status(400).json({

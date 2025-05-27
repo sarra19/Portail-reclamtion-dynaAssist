@@ -83,19 +83,19 @@ module.exports = (passport) => {
                             .input("FirstName", sql.NVarChar, profile.name.givenName || "")
                             .input("LastName", sql.NVarChar, profile.name.familyName || "")
                             .input("ProfileImage", sql.NVarChar, profileImage)
-                            .input("Address", sql.NVarChar, "") // Default value or fetch from profile if available
-                            .input("Country", sql.NVarChar, "") // Default value or fetch from profile if available
-                            .input("Password", sql.NVarChar, "") // Default value or fetch from profile if available
+                            .input("Address", sql.NVarChar, "") 
+                            .input("Country", sql.NVarChar, "") 
+                            .input("Password", sql.NVarChar, "") 
 
-                            .input("City", sql.NVarChar, "") // Default value or fetch from profile if available
-                            .input("PostalCode", sql.NVarChar, "") // Default value or fetch from profile if available
-                            .input("Biography", sql.NVarChar, "") // Default value or fetch from profile if available
-                            .input("Gender", sql.NVarChar, "") // Default value or fetch from profile if available
-                            .input("Phone", sql.NVarChar, "") // Default value or fetch from profile if available
+                            .input("City", sql.NVarChar, "") 
+                            .input("PostalCode", sql.NVarChar, "") 
+                            .input("Biography", sql.NVarChar, "") 
+                            .input("Gender", sql.NVarChar, "") 
+                            .input("Phone", sql.NVarChar, "") 
                             .input("Role", sql.Int, 1) // Default role (e.g., 1 for regular user)
                             .input("Verified", sql.Int, 1) // Assume verified via Google
-                            .input("OccupationUser", sql.NVarChar, "") // Default value or fetch from profile if available
-                            .input("CompagnyUser", sql.NVarChar, "") // Default value or fetch from profile if available
+                            .input("OccupationUser", sql.NVarChar, "") 
+                            .input("CompagnyUser", sql.NVarChar, "") 
                             .input("Provider", sql.NVarChar, "google")
                             .input("Secret", sql.NVarChar, accessToken)
                             .input("Email", sql.NVarChar, email)
@@ -118,19 +118,19 @@ module.exports = (passport) => {
                             .input("LastName", sql.NVarChar, profile.name.familyName || "")
                             .input("Email", sql.NVarChar, email)
                             .input("ProfileImage", sql.NVarChar, profileImage)
-                            .input("Address", sql.NVarChar, "") // Default value or fetch from profile if available
-                            .input("Country", sql.NVarChar, "") // Default value or fetch from profile if available
-                            .input("City", sql.NVarChar, "") // Default value or fetch from profile if available
-                            .input("Password", sql.NVarChar, "") // Default value or fetch from profile if available
+                            .input("Address", sql.NVarChar, "") 
+                            .input("Country", sql.NVarChar, "") 
+                            .input("City", sql.NVarChar, "") 
+                            .input("Password", sql.NVarChar, "") 
 
-                            .input("PostalCode", sql.NVarChar, "") // Default value or fetch from profile if available
-                            .input("Biography", sql.NVarChar, "") // Default value or fetch from profile if available
-                            .input("Gender", sql.NVarChar, "") // Default value or fetch from profile if available
-                            .input("Phone", sql.NVarChar, "") // Default value or fetch from profile if available
+                            .input("PostalCode", sql.NVarChar, "") 
+                            .input("Biography", sql.NVarChar, "") 
+                            .input("Gender", sql.NVarChar, "") 
+                            .input("Phone", sql.NVarChar, "") 
                             .input("Role", sql.Int, 1) // Default role (e.g., 1 for regular user)
                             .input("Verified", sql.Int, 1) // Assume verified via Google
-                            .input("OccupationUser", sql.NVarChar, "") // Default value or fetch from profile if available
-                            .input("CompagnyUser", sql.NVarChar, "") // Default value or fetch from profile if available
+                            .input("OccupationUser", sql.NVarChar, "") 
+                            .input("CompagnyUser", sql.NVarChar, "") 
                             .input("Provider", sql.NVarChar, "google")
                             .input("Secret", sql.NVarChar, accessToken)
                             .query(insertUserQuery);
@@ -142,18 +142,18 @@ module.exports = (passport) => {
                             LastName: profile.name.familyName || "",
                             Email: email,
                             ProfileImage: profileImage,
-                            Address: "", // Default value or fetch from profile if available
-                            Country: "", // Default value or fetch from profile if available
+                            Address: "", 
+                            Country: "", 
                             City: "",
-                            Password:"" ,// Default value or fetch from profile if available
-                            PostalCode: "", // Default value or fetch from profile if available
-                            Biography: "", // Default value or fetch from profile if available
-                            Gender: "", // Default value or fetch from profile if available
-                            Phone: "", // Default value or fetch from profile if available
+                            Password:"" ,
+                            PostalCode: "", 
+                            Biography: "", 
+                            Gender: "", 
+                            Phone: "", 
                             Role: 1, // Default role (e.g., 1 for regular user)
                             Verified: 1, // Assume verified via Google
-                            OccupationUser: "", // Default value or fetch from profile if available
-                            CompagnyUser: "", // Default value or fetch from profile if available
+                            OccupationUser: "", 
+                            CompagnyUser: "", 
                             Provider: "google",
                             Secret: accessToken,
                         };
