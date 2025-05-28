@@ -82,7 +82,7 @@ async function add(req, res) { //ajout like produit
           VALUES
             (@UserID, @ProductID,@ServiceID ,@CreatedAt)
         `;
-        const defaultServiceID = ServiceID || "vide" ;
+        const defaultServiceID = "vide" ;
 
         const createdAt = new Date();
         await pool.request()
@@ -184,7 +184,7 @@ async function add(req, res) { //ajout like produit
           VALUES
             (@UserID, @ServiceID,@ProductID, @CreatedAt)
         `;
-  const defaultProductID = ProductID || "vide" ;
+  const defaultProductID = "vide" ;
         const createdAt = new Date();
         await pool.request()
           .input('UserID', sql.NVarChar, UserID)
