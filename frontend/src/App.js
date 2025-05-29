@@ -46,26 +46,29 @@ const App = () => {
   const dispatch = useDispatch();
   const [Email, setEmail] = useState('');
   const [otp, setOTP] = useState('');
-  const fetchUserDetails = useCallback(async () => {
-    try {
+ const fetchUserDetails = useCallback(async () => {
+  try {
+    const response = await fetch(SummaryApi.current_user.url, {
+      method: SummaryApi.current_user.method,
+      credentials: 'include'
+    });
 
-      const response = await fetch(SummaryApi.current_user.url, {
-        method: SummaryApi.current_user.method,
-        credentials: 'include'
-      });
+    const dataApi = await response.json();
 
-
-      const dataApi = await response.json();
-
-      if (dataApi.success) {
-        dispatch(setUserDetails(dataApi.data));
-      } else {
-        console.error("API returned an error:", dataApi.message);
-      }
-    } catch (error) {
-      console.error("Error fetching user details:", error);
+    if (dataApi.success) {
+      // Store user details in localStorage
+      localStorage.setItem('userDetails', JSON.stringify(dataApi.data));
+      dispatch(setUserDetails(dataApi.data));
+    } else {
+      console.error("API returned an error:", dataApi.message);
+      // Optionally remove user details from localStorage if request fails
+      localStorage.removeItem('userDetails');
     }
-  }, [dispatch]);
+  } catch (error) {
+    console.error("Error fetching user details:", error);
+    localStorage.removeItem('userDetails');
+  }
+}, [dispatch]);
 
 
 
