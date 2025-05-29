@@ -366,12 +366,13 @@ async function SignIn(req, res) {
       const tokenOptions = {
         httpOnly: true,
         secure: true,
-        SameSite: 'Lax',
+        SameSite: 'None',
+        path: '/',
         maxAge: 1000 * 60 * 60 * 24, // 1 day
       };
   
       res.setHeader('Set-Cookie', [
-        `token=${token}; HttpOnly=true; Secure=true; SameSite=None; Max-Age=${tokenOptions.maxAge}`,
+        `token=${token}; HttpOnly=true; Secure=true; SameSite=None;Path=/; Max-Age=${tokenOptions.maxAge}`,
       ]);
   
       // Retourner l'ID de l'utilisateur dans la réponse
@@ -464,7 +465,7 @@ async function SignIn(req, res) {
         const token = jwt.sign(tokenData, process.env.TOKEN_SECRET_KEY, { expiresIn: "8h" });
 
         res.setHeader('Set-Cookie', [
-            `token=${token}; HttpOnly=true; Secure=true; SameSite=None; Max-Age=${1000 * 60 * 60 * 24}`,
+            `token=${token}; HttpOnly=true; Secure=true; SameSite=None;Path=/; Max-Age=${1000 * 60 * 60 * 24}`,
         ]);
 
         return res.status(200).json({
@@ -488,11 +489,12 @@ async function userLogout(req, res) {
         const tokenOption = {
             httpOnly: true,
             secure: true,
-            SameSite: 'Lax',
+            SameSite: 'None',
+            path: '/',
             maxAge: 0, // Expire immédiatement
         }
         res.setHeader('Set-Cookie', [
-            `token=; HttpOnly=true; Secure=true; SameSite=None; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0`,
+            `token=; HttpOnly=true; Secure=true; SameSite=None;Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0`,
         ]);
         res.clearCookie("token", tokenOption);
 
