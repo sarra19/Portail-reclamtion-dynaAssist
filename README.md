@@ -13,12 +13,19 @@ DynaAssist est un portail web de gestion des réclamations clients et fournisseu
 
 ## 🎯 Fonctionnalités principales
 
-- 🔐 Authentification classique et par reconnaissance faciale
-- 📩 Soumission de réclamations (clients/fournisseurs)
-- 🔧 Gestion des réponses (maintenance, remboursement, etc.)
-- 🧾 Historique des activités utilisateurs
-- 🔔 Système de notifications
-- 📊 Tableau de bord pour les administrateurs
+- 🔐 Authentification classique et par reconnaissance faciale (face-api.js)
+- 📩 Soumission de réclamations par les clients et fournisseurs
+- 🌐 Traduction automatique des réclamations et réponses
+- 🗣️ Transcription vocale en texte des réclamations
+- 🧠 Modèle intelligent de suggestion de réponses
+- 🏷️ Génération automatique de tags à partir du contenu des réclamations
+- 💬 Espace collaboratif avec rooms et chat en temps réel
+- 🧾 Historique complet des activités des utilisateurs
+- 🔧 Gestion des réponses (maintenance, remboursement, prise en charge, etc.)
+- 📆 Suivi des actions via un calendrier intégré
+- 🔔 Système de notifications dynamiques
+- ⚡ Notifications en temps réel avec Socket.IO
+- 📊 Tableau de bord analytique pour les administrateurs
 
 ## 📎 Objectifs
 
